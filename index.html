@@ -166,6 +166,7 @@
         .value-description {
             font-size: 10px;
             color: #ccc;
+            line-height: 1.4;
         }
 
         .message-container {
@@ -478,6 +479,42 @@
             display: block;
         }
 
+        .admin-player-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .admin-player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .btn-remove-player {
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-player:hover {
+            background: #f44336;
+            transform: scale(1.1);
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -642,8 +679,8 @@
                     <div class="value-card">
                         <div class="value-icon"><i class="fas fa-sync-alt"></i></div>
                         <div class="value-title">RE-BUY</div>
-                        <div class="value-amount">R$ 30</div>
-                        <div class="value-description">ILIMITADOS</div>
+                        <div class="value-amount">R$ 25</div>
+                        <div class="value-description">ILIMITADOS - SIMPLES OU DUPLO</div>
                     </div>
                     <div class="value-card">
                         <div class="value-icon"><i class="fas fa-plus-circle"></i></div>
@@ -733,10 +770,8 @@
                     </div>
                     <button class="btn btn-confirm" onclick="loginAdmin()">Entrar</button>
                     <div id="adminControls" style="display: none;">
-                        <div class="input-group">
-                            <input type="text" id="playerToRemove" placeholder="Nome do jogador para remover">
-                        </div>
-                        <button class="btn btn-cancel" onclick="removePlayer()">Remover Jogador</button>
+                        <h4 style="color: #ccaa00; margin-bottom: 10px;">Jogadores Inscritos:</h4>
+                        <div class="admin-player-list" id="adminPlayerList"></div>
                     </div>
                 </div>
             </div>
@@ -774,7 +809,7 @@
                 <h3>🏆 Estrutura do Torneio</h3>
                 <ul>
                     <li>• Buy-in: R$ 100,00 (fichas iniciais)</li>
-                    <li>• Re-buys ilimitados: R$ 30,00</li>
+                    <li>• Re-buys ilimitados: R$ 25,00 (simples ou duplo)</li>
                     <li>• Add-on opcional: R$ 50,00</li>
                     <li>• Modalidade: Texas Hold'em No Limit</li>
                 </ul>
@@ -829,8 +864,8 @@
         const confirmadosRef = database.ref('confirmados');
         
         let selectedDinner = '';
+        let allPlayers = [];
         
-        // Função para capitalizar primeira letra de cada palavra
         function capitalizeName(name) {
             return name
                 .toLowerCase()
@@ -858,8 +893,8 @@
                     });
                 }
                 
-                // Ordenar por timestamp
                 players.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+                allPlayers = players;
                 
                 document.getElementById('confirmedCount').textContent = players.length;
                 
@@ -868,7 +903,6 @@
                 document.getElementById('countNewSoccer').textContent = newSoccerCount;
                 document.getElementById('countQuinta').textContent = quintaCount;
                 
-                // Calcular janta mais votada
                 const dinnerVotes = {
                     'Bife a Role': { votes: 0, icon: '🥩' },
                     'Vaca Atolada': { votes: 0, icon: '🍖' },
@@ -900,37 +934,70 @@
                     document.getElementById('mostVotedVotes').textContent = '';
                 }
                 
-                const playerList = document.getElementById('playerList');
-                playerList.innerHTML = '';
-                
-                players.forEach((player, index) => {
-                    const playerItem = document.createElement('div');
-                    playerItem.className = 'player-item';
-                    
-                    const groupBadge = player.group === 'Poker New Soccer' 
-                        ? `<span class="badge badge-turma-new">${player.group}</span>`
-                        : `<span class="badge badge-turma-quinta">${player.group}</span>`;
-                    
-                    const dinnerBadge = player.dinner 
-                        ? `<span class="badge badge-janta">🍽️ ${player.dinner}</span>`
-                        : '';
-                    
-                    playerItem.innerHTML = `
-                        <div class="player-info">
-                            <div style="display: flex; align-items: center;">
-                                <span class="player-number">${index + 1}</span>
-                                <span class="player-name">🃏 ${player.name}</span>
-                            </div>
-                            ${player.phone ? `<span style="color: #25D366; font-size: 12px;"><i class="fab fa-whatsapp"></i> ${player.phone}</span>` : ''}
-                        </div>
-                        <div class="badge-container">
-                            ${groupBadge}
-                            ${dinnerBadge}
-                        </div>
-                    `;
-                    playerList.appendChild(playerItem);
-                });
+                updatePlayerList();
+                updateAdminPlayerList();
             });
+        }
+        
+        function updatePlayerList() {
+            const playerList = document.getElementById('playerList');
+            playerList.innerHTML = '';
+            
+            allPlayers.forEach((player, index) => {
+                const playerItem = document.createElement('div');
+                playerItem.className = 'player-item';
+                
+                const groupBadge = player.group === 'Poker New Soccer' 
+                    ? `<span class="badge badge-turma-new">${player.group}</span>`
+                    : `<span class="badge badge-turma-quinta">${player.group}</span>`;
+                
+                const dinnerBadge = player.dinner 
+                    ? `<span class="badge badge-janta">🍽️ ${player.dinner}</span>`
+                    : '';
+                
+                playerItem.innerHTML = `
+                    <div class="player-info">
+                        <div style="display: flex; align-items: center;">
+                            <span class="player-number">${index + 1}</span>
+                            <span class="player-name">🃏 ${player.name}</span>
+                        </div>
+                        ${player.phone ? `<span style="color: #25D366; font-size: 12px;"><i class="fab fa-whatsapp"></i> ${player.phone}</span>` : ''}
+                    </div>
+                    <div class="badge-container">
+                        ${groupBadge}
+                        ${dinnerBadge}
+                    </div>
+                `;
+                playerList.appendChild(playerItem);
+            });
+        }
+        
+        function updateAdminPlayerList() {
+            const adminPlayerList = document.getElementById('adminPlayerList');
+            adminPlayerList.innerHTML = '';
+            
+            allPlayers.forEach((player, index) => {
+                const adminPlayerItem = document.createElement('div');
+                adminPlayerItem.className = 'admin-player-item';
+                adminPlayerItem.innerHTML = `
+                    <span style="font-size: 13px;">${index + 1}. ${player.name} (${player.group})</span>
+                    <button class="btn-remove-player" onclick="removePlayerById('${player.id}')" title="Remover jogador">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                adminPlayerList.appendChild(adminPlayerItem);
+            });
+        }
+        
+        function removePlayerById(playerId) {
+            if (confirm('Tem certeza que deseja remover este jogador?')) {
+                confirmadosRef.child(playerId).remove().then(() => {
+                    showModal('✅', 'Jogador removido com sucesso!');
+                }).catch((error) => {
+                    console.error("Erro:", error);
+                    showModal('❌', 'Erro ao remover jogador.');
+                });
+            }
         }
         
         function formatPhone(phone) {
@@ -1012,45 +1079,30 @@
                 return;
             }
             
-            confirmadosRef.once('value').then((snapshot) => {
-                const data = snapshot.val();
-                let found = false;
-                let playerGroup = '';
-                let playerPhone = '';
-                
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        if (data[key].name === name) {
-                            found = true;
-                            playerGroup = data[key].group;
-                            playerPhone = data[key].phone || 'Não informado';
-                            
-                            let whatsappNumber;
-                            if (playerGroup === 'Poker de Quinta') {
-                                whatsappNumber = '5541987210685';
-                            } else if (playerGroup === 'Poker New Soccer') {
-                                whatsappNumber = '5541998046898';
-                            } else {
-                                whatsappNumber = '5541987210685';
-                            }
-                            
-                            const message = `Olá! Gostaria de cancelar minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${name}%0A*WhatsApp:* ${playerPhone}%0A*Turma:* ${playerGroup}%0A%0A*Motivo:* Por favor, remova meu nome da lista.`;
-                            
-                            window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
-                            
-                            confirmadosRef.child(key).remove();
-                        }
-                    });
-                }
-                
-                closeCancelModal();
-                
-                if (found) {
-                    showModal('📱', 'WhatsApp aberto para confirmar cancelamento. Sua inscrição foi removida!');
+            const player = allPlayers.find(p => p.name === name);
+            
+            if (player) {
+                let whatsappNumber;
+                if (player.group === 'Poker de Quinta') {
+                    whatsappNumber = '5541987210685';
+                } else if (player.group === 'Poker New Soccer') {
+                    whatsappNumber = '5541998046898';
                 } else {
-                    showModal('❌', 'Nome não encontrado na lista.');
+                    whatsappNumber = '5541987210685';
                 }
-            });
+                
+                const message = `Olá! Gostaria de cancelar minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${player.name}%0A*WhatsApp:* ${player.phone || 'Não informado'}%0A*Turma:* ${player.group}%0A%0A*Motivo:* Por favor, remova meu nome da lista.`;
+                
+                window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+                
+                confirmadosRef.child(player.id).remove().then(() => {
+                    closeCancelModal();
+                    showModal('📱', 'WhatsApp aberto para confirmar cancelamento. Sua inscrição foi removida!');
+                });
+            } else {
+                closeCancelModal();
+                showModal('❌', 'Nome não encontrado na lista.');
+            }
         }
         
         function toggleAdmin() {
@@ -1063,40 +1115,11 @@
             
             if (password === 'poker123') {
                 document.getElementById('adminControls').style.display = 'block';
+                updateAdminPlayerList();
                 showModal('✅', 'Login realizado!');
             } else {
                 showModal('❌', 'Senha incorreta!');
             }
-        }
-        
-        function removePlayer() {
-            const name = capitalizeName(document.getElementById('playerToRemove').value.trim());
-            
-            if (!name) {
-                showModal('❌', 'Digite o nome do jogador!');
-                return;
-            }
-            
-            confirmadosRef.once('value').then((snapshot) => {
-                const data = snapshot.val();
-                let found = false;
-                
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        if (data[key].name === name) {
-                            found = true;
-                            confirmadosRef.child(key).remove();
-                        }
-                    });
-                }
-                
-                if (found) {
-                    document.getElementById('playerToRemove').value = '';
-                    showModal('✅', `${name} foi removido!`);
-                } else {
-                    showModal('❌', 'Jogador não encontrado!');
-                }
-            });
         }
         
         function showRules() {
