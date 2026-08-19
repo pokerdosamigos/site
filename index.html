@@ -235,6 +235,30 @@
             font-family: 'Anton', sans-serif;
         }
 
+        .most-voted-dinner {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            border-radius: 12px;
+        }
+
+        .most-voted-title {
+            font-size: 11px;
+            color: #ffb74d;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .most-voted-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffb74d;
+            font-family: 'Anton', sans-serif;
+        }
+
         .confirm-form {
             margin-top: 20px;
         }
@@ -371,6 +395,20 @@
             margin-bottom: 8px;
         }
 
+        .player-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: rgba(204, 170, 0, 0.2);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            color: #ccaa00;
+            margin-right: 8px;
+        }
+
         .player-name {
             font-size: 14px;
             font-weight: 500;
@@ -451,7 +489,7 @@
         }
 
         .modal-content {
-            background: #1a1a1a;
+            background: linear-gradient(135deg, #1a1a1a, #2c1810);
             border-radius: 20px;
             padding: 30px;
             width: 90%;
@@ -470,6 +508,51 @@
             margin-bottom: 20px;
             color: #ddd;
             line-height: 1.6;
+        }
+
+        .rules-modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .rules-modal-content h2 {
+            text-align: center;
+            color: #ccaa00;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .rules-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(204, 170, 0, 0.2);
+        }
+
+        .rules-section h3 {
+            color: #ccaa00;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .rules-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rules-section li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        .rules-section li:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -514,8 +597,8 @@
                     <div class="value-card">
                         <div class="value-icon"><i class="fas fa-sync-alt"></i></div>
                         <div class="value-title">RE-BUY</div>
-                        <div class="value-amount">R$ 25</div>
-                        <div class="value-description">ILIMITADOS - SIMPLES OU DUPLO</div>
+                        <div class="value-amount">R$ 30</div>
+                        <div class="value-description">ILIMITADOS</div>
                     </div>
                     <div class="value-card">
                         <div class="value-icon"><i class="fas fa-plus-circle"></i></div>
@@ -528,7 +611,7 @@
 
             <div class="message-container">
                 <div class="message-text">
-                    "Este encontro tem como objetivo confraternizar duas turmas que têm membros em comum. O espírito do poker e a resenha devem prevalecer. É apenas um motivo para reunir os amigos, dar aquela baralhada, tomar uma cerveja e comer uma boa janta.Vote na enquete a sua janta preferida, A Democracia Vence!"
+                    "Este encontro tem como objetivo confraternizar duas turmas que têm membros em comum. O espírito do poker e a resenha devem prevalecer. É apenas um motivo para reunir os amigos, dar aquela baralhada, tomar uma cerveja e comer uma boa janta."
                 </div>
             </div>
 
@@ -546,6 +629,11 @@
                         <div class="division-title">Poker de Quinta</div>
                         <div class="division-count" id="countQuinta">0</div>
                     </div>
+                </div>
+
+                <div class="most-voted-dinner">
+                    <div class="most-voted-title">🍽️ Janta Mais Votada</div>
+                    <div class="most-voted-name" id="mostVotedDinner">-</div>
                 </div>
             </div>
 
@@ -589,7 +677,7 @@
                 <div id="playerList"></div>
             </div>
 
-            <button class="btn btn-rules" onclick="alert('Regras:\n\n• Buy-in: R$ 100\n• Re-buys Simples ou Duplo ilimitados: R$ 25\n• Add-on opcional: R$ 50\n• Texas Hold\'em No Limit\n• Respeito entre todos\n• Diversão em primeiro lugar!')">📋 Regras do Evento</button>
+            <button class="btn btn-rules" onclick="showRules()">📋 Regras do Evento</button>
 
             <div class="admin-section">
                 <div class="admin-toggle" onclick="toggleAdmin()">🔐 Área Admin</div>
@@ -609,6 +697,7 @@
         </div>
     </div>
 
+    <!-- Modal de Sucesso/Erro -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-icon" id="modalIcon">✅</div>
@@ -617,8 +706,55 @@
         </div>
     </div>
 
+    <!-- Modal de Regras -->
+    <div class="modal" id="rulesModal">
+        <div class="modal-content rules-modal-content">
+            <h2>📋 Regras do Evento</h2>
+            
+            <div class="rules-section">
+                <h3>🏆 Estrutura do Torneio</h3>
+                <ul>
+                    <li>• Buy-in: R$ 100,00 (fichas iniciais)</li>
+                    <li>• Re-buys ilimitados: R$ 30,00</li>
+                    <li>• Add-on opcional: R$ 50,00</li>
+                    <li>• Modalidade: Texas Hold'em No Limit</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>🃏 Regras Básicas</h3>
+                <ul>
+                    <li>• Cada jogador recebe 2 cartas fechadas</li>
+                    <li>• 5 cartas comunitárias na mesa</li>
+                    <li>• Melhor combinação de 5 cartas vence</li>
+                    <li>• Apostas em sentido horário</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>🤝 Conduta</h3>
+                <ul>
+                    <li>• Respeito entre todos os jogadores</li>
+                    <li>• Proibido revelar cartas em jogo</li>
+                    <li>• Decisões do dealer são finais</li>
+                    <li>• Diversão e amizade em primeiro lugar</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>💰 Premiação</h3>
+                <ul>
+                    <li>• 1º Lugar: 50% do pote</li>
+                    <li>• 2º Lugar: 30% do pote</li>
+                    <li>• 3º Lugar: 20% do pote</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-confirm" onclick="closeRulesModal()">Entendi</button>
+        </div>
+    </div>
+
     <script>
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyASHowL5Bf1WQlgaXvGjSPWRQxY-gjRWE8",
             authDomain: "pokerdosamigos.firebaseapp.com",
@@ -629,7 +765,6 @@
             appId: "1:588322228014:web:7c214d97eac03c0b835cbf"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const confirmadosRef = database.ref('confirmados');
@@ -655,6 +790,9 @@
                     });
                 }
                 
+                // Ordenar por timestamp
+                players.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+                
                 document.getElementById('confirmedCount').textContent = players.length;
                 
                 const newSoccerCount = players.filter(p => p.group === 'Poker New Soccer').length;
@@ -662,10 +800,39 @@
                 document.getElementById('countNewSoccer').textContent = newSoccerCount;
                 document.getElementById('countQuinta').textContent = quintaCount;
                 
+                // Calcular janta mais votada
+                const dinnerVotes = {
+                    'Bife a Role': 0,
+                    'Vaca Atolada': 0,
+                    'Rabada com Polenta': 0
+                };
+                
+                players.forEach(p => {
+                    if (p.dinner && dinnerVotes[p.dinner] !== undefined) {
+                        dinnerVotes[p.dinner]++;
+                    }
+                });
+                
+                let mostVoted = '-';
+                let maxVotes = 0;
+                
+                Object.keys(dinnerVotes).forEach(dinner => {
+                    if (dinnerVotes[dinner] > maxVotes) {
+                        maxVotes = dinnerVotes[dinner];
+                        mostVoted = dinner;
+                    }
+                });
+                
+                if (maxVotes > 0) {
+                    document.getElementById('mostVotedDinner').textContent = `${mostVoted} (${maxVotes} voto${maxVotes > 1 ? 's' : ''})`;
+                } else {
+                    document.getElementById('mostVotedDinner').textContent = '-';
+                }
+                
                 const playerList = document.getElementById('playerList');
                 playerList.innerHTML = '';
                 
-                players.forEach((player) => {
+                players.forEach((player, index) => {
                     const playerItem = document.createElement('div');
                     playerItem.className = 'player-item';
                     
@@ -679,7 +846,10 @@
                     
                     playerItem.innerHTML = `
                         <div class="player-info">
-                            <span class="player-name">🃏 ${player.name}</span>
+                            <div style="display: flex; align-items: center;">
+                                <span class="player-number">${index + 1}</span>
+                                <span class="player-name">🃏 ${player.name}</span>
+                            </div>
                             ${player.phone ? `<span style="color: #25D366; font-size: 12px;"><i class="fab fa-whatsapp"></i> ${player.phone}</span>` : ''}
                         </div>
                         <div class="badge-container">
@@ -764,14 +934,30 @@
             confirmadosRef.once('value').then((snapshot) => {
                 const data = snapshot.val();
                 let found = false;
+                let playerGroup = '';
+                let playerPhone = '';
                 
                 if (data) {
                     Object.keys(data).forEach(key => {
                         if (data[key].name === name) {
                             found = true;
-                            const playerData = data[key];
-                            const message = `Olá! Gostaria de cancelar minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${name}%0A*WhatsApp:* ${playerData.phone || 'Não informado'}%0A%0A*Motivo:* Por favor, remova meu nome da lista.`;
-                            window.open(`https://wa.me/5541987210685?text=${message}`, '_blank');
+                            playerGroup = data[key].group;
+                            playerPhone = data[key].phone || 'Não informado';
+                            
+                            // Definir número de WhatsApp baseado na turma
+                            let whatsappNumber;
+                            if (playerGroup === 'Poker de Quinta') {
+                                whatsappNumber = '5541987210685';
+                            } else if (playerGroup === 'Poker New Soccer') {
+                                whatsappNumber = '5541998046898';
+                            } else {
+                                whatsappNumber = '5541987210685';
+                            }
+                            
+                            const message = `Olá! Gostaria de cancelar minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${name}%0A*WhatsApp:* ${playerPhone}%0A*Turma:* ${playerGroup}%0A%0A*Motivo:* Por favor, remova meu nome da lista.`;
+                            
+                            window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+                            
                             confirmadosRef.child(key).remove();
                         }
                     });
@@ -780,7 +966,7 @@
                 if (found) {
                     document.getElementById('playerName').value = '';
                     document.getElementById('playerPhone').value = '';
-                    showModal('📱', 'WhatsApp aberto. Inscrição removida!');
+                    showModal('📱', 'WhatsApp aberto para confirmar cancelamento. Sua inscrição foi removida!');
                 } else {
                     showModal('❌', 'Nome não encontrado.');
                 }
@@ -795,7 +981,7 @@
         function loginAdmin() {
             const password = document.getElementById('adminPassword').value;
             
-            if (password === 'poker2026') {
+            if (password === 'poker123') {
                 document.getElementById('adminControls').style.display = 'block';
                 showModal('✅', 'Login realizado!');
             } else {
@@ -831,6 +1017,14 @@
                     showModal('❌', 'Jogador não encontrado!');
                 }
             });
+        }
+        
+        function showRules() {
+            document.getElementById('rulesModal').classList.add('active');
+        }
+        
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.remove('active');
         }
         
         function showModal(icon, message) {
