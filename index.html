@@ -7,12 +7,12 @@
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
-    <!-- Google Fonts - Anton + Montserrat -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
@@ -28,31 +28,15 @@
             min-height: 100vh;
             padding: 16px;
             color: #fff;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(204, 170, 0, 0.05) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 1;
         }
 
         .container {
             max-width: 400px;
             margin: 0 auto;
-            position: relative;
-            z-index: 2;
         }
 
         .container-card {
             background: rgba(30, 30, 30, 0.95);
-            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
             border: 1px solid rgba(204, 170, 0, 0.2);
@@ -67,13 +51,11 @@
 
         .header h1 {
             font-size: 36px;
-            font-weight: 400;
             color: #ccaa00;
             margin-bottom: 8px;
             letter-spacing: 2px;
             font-family: 'Anton', sans-serif;
             text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(204, 170, 0, 0.3);
         }
 
         .header .subtitle {
@@ -81,7 +63,6 @@
             color: #ccaa00;
             font-weight: 500;
             letter-spacing: 1px;
-            font-family: 'Montserrat', sans-serif;
             text-transform: uppercase;
         }
 
@@ -95,7 +76,6 @@
             color: #ccaa00;
             text-align: center;
             letter-spacing: 1px;
-            font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -106,8 +86,6 @@
             margin-bottom: 15px;
             font-size: 14px;
             line-height: 1.6;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
         }
 
         .detail-item .icon {
@@ -136,26 +114,18 @@
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
             text-decoration: none;
-        }
-
-        .address-link:hover {
-            transform: translateY(-2px);
         }
 
         .maps-icon {
             color: #4285f4;
             font-size: 24px;
-            filter: drop-shadow(0 2px 4px rgba(66, 133, 244, 0.3));
         }
 
         .address-text {
             color: #ccc;
             font-size: 13px;
             margin-top: 4px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
         }
 
         .values-container {
@@ -171,20 +141,10 @@
             border-radius: 15px;
             padding: 15px;
             text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .value-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(204, 170, 0, 0.2);
         }
 
         .value-icon {
             margin-bottom: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 50px;
             font-size: 35px;
             color: #ccaa00;
         }
@@ -195,24 +155,17 @@
             font-weight: 600;
             margin-bottom: 5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Montserrat', sans-serif;
         }
 
         .value-amount {
             font-size: 18px;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-            font-family: 'Montserrat', sans-serif;
         }
 
         .value-description {
             font-size: 10px;
             color: #ccc;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
         }
 
         .message-container {
@@ -222,27 +175,12 @@
             padding: 20px;
             margin: 20px 0;
             text-align: center;
-            position: relative;
-        }
-
-        .message-container::before {
-            content: '🃏';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 30px;
-            background: #1a1a1a;
-            padding: 0 10px;
         }
 
         .message-text {
             font-size: 13px;
             line-height: 1.8;
             color: #ddd;
-            font-style: normal;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
         }
 
         .confirmed-count {
@@ -252,23 +190,18 @@
             background: linear-gradient(135deg, rgba(204, 170, 0, 0.1), rgba(180, 140, 0, 0.1));
             border-radius: 20px;
             border: 2px solid rgba(204, 170, 0, 0.3);
-            position: relative;
         }
 
         .count-number {
             font-size: 48px;
-            font-weight: 400;
             color: #ccaa00;
             margin: 10px 0;
             font-family: 'Anton', sans-serif;
-            text-shadow: 0 0 20px rgba(204, 170, 0, 0.3);
         }
 
         .count-label {
             font-size: 13px;
             color: #ccc;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
             letter-spacing: 1px;
         }
 
@@ -293,7 +226,6 @@
             font-weight: 600;
             margin-bottom: 5px;
             text-transform: uppercase;
-            font-family: 'Montserrat', sans-serif;
         }
 
         .division-count {
@@ -318,7 +250,6 @@
             display: block;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .input-group input,
@@ -330,13 +261,9 @@
             background: rgba(255, 255, 255, 0.05);
             color: #fff;
             font-size: 14px;
-            transition: all 0.3s ease;
             font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
             appearance: none;
             -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
         }
 
         .input-group select {
@@ -349,21 +276,6 @@
         .input-group select option {
             background: #1a1a1a;
             color: #fff;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus {
-            outline: none;
-            border-color: #ccaa00;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 15px rgba(204, 170, 0, 0.2);
-        }
-
-        .input-group input::placeholder {
-            color: #999;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
         }
 
         .dinner-options {
@@ -380,18 +292,11 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .dinner-option:hover {
-            border-color: #ccaa00;
-            background: rgba(204, 170, 0, 0.1);
         }
 
         .dinner-option.selected {
             border-color: #ccaa00;
             background: rgba(204, 170, 0, 0.2);
-            box-shadow: 0 0 15px rgba(204, 170, 0, 0.3);
         }
 
         .dinner-icon {
@@ -402,7 +307,6 @@
         .dinner-name {
             font-size: 10px;
             color: #ccc;
-            font-weight: 500;
             text-transform: uppercase;
         }
 
@@ -424,25 +328,11 @@
         .btn-confirm {
             background: linear-gradient(135deg, #00c853, #00e676);
             color: #fff;
-            box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3);
-        }
-
-        .btn-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 200, 83, 0.5);
-            background: linear-gradient(135deg, #00e676, #00c853);
         }
 
         .btn-cancel {
             background: linear-gradient(135deg, #d32f2f, #f44336);
             color: #fff;
-            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
-        }
-
-        .btn-cancel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(211, 47, 47, 0.5);
-            background: linear-gradient(135deg, #f44336, #d32f2f);
         }
 
         .btn-rules {
@@ -450,12 +340,6 @@
             color: #ccaa00;
             border: 1px solid #ccaa00;
             margin-top: 10px;
-        }
-
-        .btn-rules:hover {
-            background: rgba(204, 170, 0, 0.1);
-            box-shadow: 0 5px 15px rgba(204, 170, 0, 0.3);
-            transform: translateY(-2px);
         }
 
         .confirmed-list {
@@ -466,9 +350,7 @@
             font-size: 15px;
             margin-bottom: 15px;
             color: #ccaa00;
-            font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            letter-spacing: 1px;
             text-transform: uppercase;
         }
 
@@ -492,7 +374,6 @@
         .player-name {
             font-size: 14px;
             font-weight: 500;
-            font-family: 'Montserrat', sans-serif;
         }
 
         .badge-container {
@@ -507,8 +388,6 @@
             font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-family: 'Montserrat', sans-serif;
         }
 
         .badge-turma-new {
@@ -543,9 +422,6 @@
             font-size: 13px;
             cursor: pointer;
             text-decoration: underline;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            letter-spacing: 1px;
         }
 
         .admin-form {
@@ -575,7 +451,7 @@
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #1a1a1a, #2c1810);
+            background: #1a1a1a;
             border-radius: 20px;
             padding: 30px;
             width: 90%;
@@ -594,96 +470,19 @@
             margin-bottom: 20px;
             color: #ddd;
             line-height: 1.6;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-        }
-
-        .rules-modal-content {
-            max-height: 80vh;
-            overflow-y: auto;
-            text-align: left;
-        }
-
-        .rules-modal-content h2 {
-            text-align: center;
-            color: #ccaa00;
-            margin-bottom: 20px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .rules-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(204, 170, 0, 0.2);
-        }
-
-        .rules-section h3 {
-            color: #ccaa00;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .rules-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .rules-section li {
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 12px;
-            color: #ddd;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-        }
-
-        .rules-section li:last-child {
-            border-bottom: none;
-        }
-
-        @media (max-width: 360px) {
-            body {
-                padding: 10px;
-            }
-            
-            .container-card {
-                padding: 15px;
-            }
-            
-            .count-number {
-                font-size: 40px;
-            }
-            
-            .values-container {
-                gap: 5px;
-            }
-            
-            .value-card {
-                padding: 10px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Container Principal -->
         <div class="container-card">
             <div class="header">
                 <h1>POKER DOS AMIGOS</h1>
                 <div class="subtitle">CONFIRMAÇÃO DE PRESENÇA</div>
             </div>
 
-            <!-- Detalhes do Evento -->
             <div class="event-details">
-                <h2><i class="fas fa-calendar-alt"></i> DETALHES DO EVENTO</h2>
+                <h2>📅 DETALHES DO EVENTO</h2>
                 <div class="detail-item">
                     <div class="icon"><i class="fas fa-calendar calendar-icon"></i></div>
                     <div>
@@ -695,9 +494,7 @@
                     <div class="icon"><i class="fas fa-map-marker-alt location-icon"></i></div>
                     <div>
                         <strong>LOCAL:</strong> NEW SOCCER<br>
-                        <a href="https://www.google.com/maps/search/?api=1&query=Av.+Ver.+Toaldo+Tulio+n+3538+-+Sao+Braz+Curitiba" 
-                           target="_blank" 
-                           class="address-link">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Av.+Ver.+Toaldo+Tulio+n+3538+-+Sao+Braz+Curitiba" target="_blank" class="address-link">
                             <i class="fab fa-google maps-icon"></i>
                             <div class="address-text">
                                 AV. VER. TOALDO TULIO Nº 3538<br>
@@ -707,30 +504,21 @@
                     </div>
                 </div>
 
-                <!-- Valores do Torneio em 3 Containers -->
                 <div class="values-container">
                     <div class="value-card">
-                        <div class="value-icon">
-                            <i class="fas fa-coins"></i>
-                        </div>
+                        <div class="value-icon"><i class="fas fa-coins"></i></div>
                         <div class="value-title">BUY-IN</div>
                         <div class="value-amount">R$ 100</div>
                         <div class="value-description">ENTRADA INICIAL</div>
                     </div>
-
                     <div class="value-card">
-                        <div class="value-icon">
-                            <i class="fas fa-sync-alt"></i>
-                        </div>
+                        <div class="value-icon"><i class="fas fa-sync-alt"></i></div>
                         <div class="value-title">RE-BUY</div>
                         <div class="value-amount">R$ 25</div>
-                        <div class="value-description">ILIMITADOS Simples ou Duplo</div>
+                        <div class="value-description">ILIMITADOS - SIMPLES OU DUPLO</div>
                     </div>
-
                     <div class="value-card">
-                        <div class="value-icon">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
+                        <div class="value-icon"><i class="fas fa-plus-circle"></i></div>
                         <div class="value-title">ADD-ON</div>
                         <div class="value-amount">R$ 50</div>
                         <div class="value-description">FICHAS ADICIONAIS</div>
@@ -738,20 +526,17 @@
                 </div>
             </div>
 
-            <!-- Mensagem de Confraternização -->
             <div class="message-container">
                 <div class="message-text">
-                    "Este encontro tem como objetivo confraternizar duas turmas que têm membros em comum. O espírito do poker e a resenha devem prevalecer. É apenas um motivo para reunir os amigos, dar aquela baralhada, tomar uma cerveja e comer uma boa janta. Vote na Enquete a sua janta preferida, A democracia Vence!"
+                    "Este encontro tem como objetivo confraternizar duas turmas que têm membros em comum. O espírito do poker e a resenha devem prevalecer. É apenas um motivo para reunir os amigos, dar aquela baralhada, tomar uma cerveja e comer uma boa janta.Vote na enquete a sua janta preferida, A Democracia Vence!"
                 </div>
             </div>
 
-            <!-- Contador de Confirmados -->
             <div class="confirmed-count">
                 <div class="count-label">JOGADORES CONFIRMADOS</div>
                 <div class="count-number" id="confirmedCount">0</div>
                 <div class="count-label">PESSOAS</div>
                 
-                <!-- Divisão das Turmas -->
                 <div class="division-container">
                     <div class="division-card">
                         <div class="division-title">Poker New Soccer</div>
@@ -764,7 +549,6 @@
                 </div>
             </div>
 
-            <!-- Formulário de Confirmação -->
             <div class="confirm-form">
                 <div class="input-group">
                     <input type="text" id="playerName" placeholder="👤 Digite seu nome" maxlength="30">
@@ -796,93 +580,40 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-confirm" onclick="confirmPresence()"><i class="fas fa-check-circle"></i> Confirmar Presença</button>
-                <button class="btn btn-cancel" onclick="cancelPresence()"><i class="fas fa-times-circle"></i> Cancelar Inscrição</button>
+                <button class="btn btn-confirm" onclick="confirmPresence()">✅ Confirmar Presença</button>
+                <button class="btn btn-cancel" onclick="cancelPresence()">❌ Cancelar Inscrição</button>
             </div>
 
-            <!-- Lista de Confirmados -->
             <div class="confirmed-list">
-                <h3><i class="fas fa-users"></i> Jogadores Confirmados:</h3>
+                <h3>👥 Jogadores Confirmados:</h3>
                 <div id="playerList"></div>
             </div>
 
-            <!-- Botão de Regras -->
-            <button class="btn btn-rules" onclick="showRules()"><i class="fas fa-book"></i> Regras do Evento</button>
+            <button class="btn btn-rules" onclick="alert('Regras:\n\n• Buy-in: R$ 100\n• Re-buys Simples ou Duplo ilimitados: R$ 25\n• Add-on opcional: R$ 50\n• Texas Hold\'em No Limit\n• Respeito entre todos\n• Diversão em primeiro lugar!')">📋 Regras do Evento</button>
 
-            <!-- Área Admin -->
             <div class="admin-section">
-                <div class="admin-toggle" onclick="toggleAdmin()"><i class="fas fa-lock"></i> Área Admin</div>
+                <div class="admin-toggle" onclick="toggleAdmin()">🔐 Área Admin</div>
                 <div class="admin-form" id="adminForm">
                     <div class="input-group">
-                        <input type="password" id="adminPassword" placeholder="Senha admin" maxlength="20">
+                        <input type="password" id="adminPassword" placeholder="Senha admin">
                     </div>
-                    <button class="btn btn-confirm" onclick="loginAdmin()"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    <button class="btn btn-confirm" onclick="loginAdmin()">Entrar</button>
                     <div id="adminControls" style="display: none;">
                         <div class="input-group">
                             <input type="text" id="playerToRemove" placeholder="Nome do jogador para remover">
                         </div>
-                        <button class="btn btn-cancel" onclick="removePlayer()"><i class="fas fa-user-minus"></i> Remover Jogador</button>
+                        <button class="btn btn-cancel" onclick="removePlayer()">Remover Jogador</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Sucesso/Erro -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-icon" id="modalIcon">✅</div>
             <div class="modal-message" id="modalMessage"></div>
             <button class="btn btn-confirm" onclick="closeModal()">OK</button>
-        </div>
-    </div>
-
-    <!-- Modal de Regras -->
-    <div class="modal" id="rulesModal">
-        <div class="modal-content rules-modal-content">
-            <h2><i class="fas fa-book"></i> Regras do Evento</h2>
-            
-            <div class="rules-section">
-                <h3><i class="fas fa-trophy"></i> Estrutura do Torneio</h3>
-                <ul>
-                    <li>• Buy-in: R$ 100,00 (Fichas iniciais 15K)</li>
-                     <li>(R$50 Pote +R$30 Janta + R$20 Despesas)</li>
-                    <li>• Re-buys ilimitados: Simples R$ 25,00(15K em Fichas)</li>
-                    <li>• Re-buys Duplov R$50,00(30K em Fichas) (</li>
-                    <li>• Add-on opcional: R$ 50,00(50K em Fichas)</li>
-                    <li>• Modalidade: Texas Hold'em No Limit</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3><i class="fas fa-cards"></i> Regras Básicas</h3>
-                <ul>
-                    <li>• Cada jogador recebe 2 cartas fechadas</li>
-                    <li>• 5 cartas comunitárias na mesa</li>
-                    <li>• Melhor combinação de 5 cartas vence</li>
-                    <li>• Apostas em sentido horário</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3><i class="fas fa-handshake"></i> Conduta</h3>
-                <ul>
-                    <li>• Respeito entre todos os jogadores</li>
-                    <li>• Proibido revelar cartas em jogo</li>
-                    <li>• Decisões do dealer são finais</li>
-                    <li>• Diversão e amizade em primeiro lugar</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3><i class="fas fa-money-bill-wave"></i> Premiação</h3>
-                <ul>
-                    <li>• A Definir pela Organizacao</li>
-
-                </ul>
-            </div>
-
-            <button class="btn btn-confirm" onclick="closeRulesModal()">Entendi</button>
         </div>
     </div>
 
@@ -895,20 +626,16 @@
             projectId: "pokerdosamigos",
             storageBucket: "pokerdosamigos.firebasestorage.app",
             messagingSenderId: "588322228014",
-            appId: "1:588322228014:web:7c214d97eac03c0b835cbf",
-            measurementId: "G-GZSNY50N7M"
+            appId: "1:588322228014:web:7c214d97eac03c0b835cbf"
         };
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
-        // Referência à coleção de confirmados
-        const confirmadosRef = db.collection('confirmados');
+        const database = firebase.database();
+        const confirmadosRef = database.ref('confirmados');
         
         let selectedDinner = '';
         
-        // Selecionar janta
         function selectDinner(element) {
             document.querySelectorAll('.dinner-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -917,24 +644,24 @@
             selectedDinner = element.dataset.dinner;
         }
         
-        // Carregar confirmados em tempo real
         function loadConfirmedPlayers() {
-            confirmadosRef.onSnapshot((snapshot) => {
+            confirmadosRef.on('value', (snapshot) => {
                 const players = [];
-                snapshot.forEach((doc) => {
-                    players.push({ id: doc.id, ...doc.data() });
-                });
+                const data = snapshot.val();
                 
-                // Atualizar contador
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        players.push({ id: key, ...data[key] });
+                    });
+                }
+                
                 document.getElementById('confirmedCount').textContent = players.length;
                 
-                // Atualizar contagem por turma
                 const newSoccerCount = players.filter(p => p.group === 'Poker New Soccer').length;
                 const quintaCount = players.filter(p => p.group === 'Poker de Quinta').length;
                 document.getElementById('countNewSoccer').textContent = newSoccerCount;
                 document.getElementById('countQuinta').textContent = quintaCount;
                 
-                // Atualizar lista
                 const playerList = document.getElementById('playerList');
                 playerList.innerHTML = '';
                 
@@ -962,26 +689,17 @@
                     `;
                     playerList.appendChild(playerItem);
                 });
-            }, (error) => {
-                console.error("Erro ao carregar dados: ", error);
-                showModal('❌', 'Erro ao carregar dados. Verifique se o Firestore está configurado.');
             });
         }
         
-        // Formatar telefone
         function formatPhone(phone) {
             let numbers = phone.replace(/\D/g, '');
             numbers = numbers.slice(0, 11);
             
-            if (numbers.length <= 2) {
-                return numbers;
-            } else if (numbers.length <= 6) {
-                return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-            } else if (numbers.length <= 10) {
-                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
-            } else {
-                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
-            }
+            if (numbers.length <= 2) return numbers;
+            else if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+            else if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+            else return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
         }
         
         document.getElementById('playerPhone').addEventListener('input', function(e) {
@@ -1013,35 +731,25 @@
                 return;
             }
             
-            // Verificar se o nome já existe
-            confirmadosRef.where('name', '==', name).get().then((snapshot) => {
-                if (snapshot.empty) {
-                    // Adicionar novo jogador
-                    confirmadosRef.add({
-                        name: name,
-                        phone: phone,
-                        group: group,
-                        dinner: selectedDinner,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    }).then(() => {
-                        document.getElementById('playerName').value = '';
-                        document.getElementById('playerPhone').value = '';
-                        document.getElementById('playerGroup').value = '';
-                        document.querySelectorAll('.dinner-option').forEach(opt => {
-                            opt.classList.remove('selected');
-                        });
-                        selectedDinner = '';
-                        showModal('✅', `${name}, sua presença foi confirmada!`);
-                    }).catch((error) => {
-                        console.error("Erro ao confirmar: ", error);
-                        showModal('❌', 'Erro ao confirmar presença. Verifique as regras do Firestore.');
-                    });
-                } else {
-                    showModal('❌', `${name}, você já confirmou presença!`);
-                }
+            const newPlayerRef = confirmadosRef.push();
+            newPlayerRef.set({
+                name: name,
+                phone: phone,
+                group: group,
+                dinner: selectedDinner,
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('playerName').value = '';
+                document.getElementById('playerPhone').value = '';
+                document.getElementById('playerGroup').value = '';
+                document.querySelectorAll('.dinner-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                selectedDinner = '';
+                showModal('✅', `${name}, sua presença foi confirmada!`);
             }).catch((error) => {
-                console.error("Erro ao verificar: ", error);
-                showModal('❌', 'Erro ao verificar dados. Verifique as regras do Firestore.');
+                console.error("Erro:", error);
+                showModal('❌', 'Erro ao confirmar. Tente novamente.');
             });
         }
         
@@ -1053,29 +761,29 @@
                 return;
             }
             
-            confirmadosRef.where('name', '==', name).get().then((snapshot) => {
-                if (!snapshot.empty) {
-                    const doc = snapshot.docs[0];
-                    const playerData = doc.data();
-                    
-                    const message = `Olá! Gostaria de cancelar minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${name}%0A*WhatsApp:* ${playerData.phone || 'Não informado'}%0A%0A*Motivo do cancelamento:* Por favor, remova meu nome da lista.`;
-                    
-                    window.open(`https://wa.me/5541987210685?text=${message}`, '_blank');
-                    
-                    doc.ref.delete().then(() => {
-                        document.getElementById('playerName').value = '';
-                        document.getElementById('playerPhone').value = '';
-                        showModal('📱', 'WhatsApp aberto para confirmar cancelamento. Sua inscrição foi removida!');
-                    }).catch((error) => {
-                        console.error("Erro ao cancelar: ", error);
-                        showModal('❌', 'Erro ao cancelar. Tente novamente.');
+            confirmadosRef.once('value').then((snapshot) => {
+                const data = snapshot.val();
+                let found = false;
+                
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        if (data[key].name === name) {
+                            found = true;
+                            const playerData = data[key];
+                            const message = `Olá! Gostaria de cancelar minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${name}%0A*WhatsApp:* ${playerData.phone || 'Não informado'}%0A%0A*Motivo:* Por favor, remova meu nome da lista.`;
+                            window.open(`https://wa.me/5541987210685?text=${message}`, '_blank');
+                            confirmadosRef.child(key).remove();
+                        }
                     });
-                } else {
-                    showModal('❌', 'Nome não encontrado na lista de confirmados.');
                 }
-            }).catch((error) => {
-                console.error("Erro ao buscar: ", error);
-                showModal('❌', 'Erro ao buscar dados. Tente novamente.');
+                
+                if (found) {
+                    document.getElementById('playerName').value = '';
+                    document.getElementById('playerPhone').value = '';
+                    showModal('📱', 'WhatsApp aberto. Inscrição removida!');
+                } else {
+                    showModal('❌', 'Nome não encontrado.');
+                }
             });
         }
         
@@ -1089,7 +797,7 @@
             
             if (password === 'poker2026') {
                 document.getElementById('adminControls').style.display = 'block';
-                showModal('✅', 'Login como admin realizado!');
+                showModal('✅', 'Login realizado!');
             } else {
                 showModal('❌', 'Senha incorreta!');
             }
@@ -1103,31 +811,26 @@
                 return;
             }
             
-            confirmadosRef.where('name', '==', name).get().then((snapshot) => {
-                if (!snapshot.empty) {
-                    const doc = snapshot.docs[0];
-                    doc.ref.delete().then(() => {
-                        document.getElementById('playerToRemove').value = '';
-                        showModal('✅', `${name} foi removido da lista!`);
-                    }).catch((error) => {
-                        console.error("Erro ao remover: ", error);
-                        showModal('❌', 'Erro ao remover. Tente novamente.');
+            confirmadosRef.once('value').then((snapshot) => {
+                const data = snapshot.val();
+                let found = false;
+                
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        if (data[key].name === name) {
+                            found = true;
+                            confirmadosRef.child(key).remove();
+                        }
                     });
+                }
+                
+                if (found) {
+                    document.getElementById('playerToRemove').value = '';
+                    showModal('✅', `${name} foi removido!`);
                 } else {
                     showModal('❌', 'Jogador não encontrado!');
                 }
-            }).catch((error) => {
-                console.error("Erro ao buscar: ", error);
-                showModal('❌', 'Erro ao buscar dados. Tente novamente.');
             });
-        }
-        
-        function showRules() {
-            document.getElementById('rulesModal').classList.add('active');
-        }
-        
-        function closeRulesModal() {
-            document.getElementById('rulesModal').classList.remove('active');
         }
         
         function showModal(icon, message) {
@@ -1140,7 +843,6 @@
             document.getElementById('modal').classList.remove('active');
         }
         
-        // Inicializar
         loadConfirmedPlayers();
     </script>
 </body>
