@@ -845,9 +845,11 @@
             <div class="rules-section">
                 <h3><i class="fas fa-trophy"></i> Estrutura do Torneio</h3>
                 <ul>
-                    <li>• Buy-in: R$ 100,00 (fichas iniciais)</li>
-                    <li>• Re-buys ilimitados: R$ 30,00</li>
-                    <li>• Add-on opcional: R$ 50,00</li>
+                    <li>• Buy-in: R$ 100,00 (Fichas iniciais 15K)</li>
+                     <li>(R$50 Pote +R$30 Janta + R$20 Despesas)</li>
+                    <li>• Re-buys ilimitados: Simples R$ 25,00(15K em Fichas)</li>
+                    <li>• Re-buys Duplov R$50,00(30K em Fichas) (</li>
+                    <li>• Add-on opcional: R$ 50,00(50K em Fichas)</li>
                     <li>• Modalidade: Texas Hold'em No Limit</li>
                 </ul>
             </div>
@@ -875,9 +877,8 @@
             <div class="rules-section">
                 <h3><i class="fas fa-money-bill-wave"></i> Premiação</h3>
                 <ul>
-                    <li>• 1º Lugar: 50% do pote</li>
-                    <li>• 2º Lugar: 30% do pote</li>
-                    <li>• 3º Lugar: 20% do pote</li>
+                    <li>• A Definir pela Organizacao</li>
+
                 </ul>
             </div>
 
@@ -961,6 +962,9 @@
                     `;
                     playerList.appendChild(playerItem);
                 });
+            }, (error) => {
+                console.error("Erro ao carregar dados: ", error);
+                showModal('❌', 'Erro ao carregar dados. Verifique se o Firestore está configurado.');
             });
         }
         
@@ -1009,8 +1013,10 @@
                 return;
             }
             
+            // Verificar se o nome já existe
             confirmadosRef.where('name', '==', name).get().then((snapshot) => {
                 if (snapshot.empty) {
+                    // Adicionar novo jogador
                     confirmadosRef.add({
                         name: name,
                         phone: phone,
@@ -1027,11 +1033,15 @@
                         selectedDinner = '';
                         showModal('✅', `${name}, sua presença foi confirmada!`);
                     }).catch((error) => {
-                        showModal('❌', 'Erro ao confirmar presença. Tente novamente.');
+                        console.error("Erro ao confirmar: ", error);
+                        showModal('❌', 'Erro ao confirmar presença. Verifique as regras do Firestore.');
                     });
                 } else {
                     showModal('❌', `${name}, você já confirmou presença!`);
                 }
+            }).catch((error) => {
+                console.error("Erro ao verificar: ", error);
+                showModal('❌', 'Erro ao verificar dados. Verifique as regras do Firestore.');
             });
         }
         
@@ -1056,10 +1066,16 @@
                         document.getElementById('playerName').value = '';
                         document.getElementById('playerPhone').value = '';
                         showModal('📱', 'WhatsApp aberto para confirmar cancelamento. Sua inscrição foi removida!');
+                    }).catch((error) => {
+                        console.error("Erro ao cancelar: ", error);
+                        showModal('❌', 'Erro ao cancelar. Tente novamente.');
                     });
                 } else {
                     showModal('❌', 'Nome não encontrado na lista de confirmados.');
                 }
+            }).catch((error) => {
+                console.error("Erro ao buscar: ", error);
+                showModal('❌', 'Erro ao buscar dados. Tente novamente.');
             });
         }
         
@@ -1093,10 +1109,16 @@
                     doc.ref.delete().then(() => {
                         document.getElementById('playerToRemove').value = '';
                         showModal('✅', `${name} foi removido da lista!`);
+                    }).catch((error) => {
+                        console.error("Erro ao remover: ", error);
+                        showModal('❌', 'Erro ao remover. Tente novamente.');
                     });
                 } else {
                     showModal('❌', 'Jogador não encontrado!');
                 }
+            }).catch((error) => {
+                console.error("Erro ao buscar: ", error);
+                showModal('❌', 'Erro ao buscar dados. Tente novamente.');
             });
         }
         
@@ -1118,6 +1140,7 @@
             document.getElementById('modal').classList.remove('active');
         }
         
+        // Inicializar
         loadConfirmedPlayers();
     </script>
 </body>
