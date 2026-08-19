@@ -674,7 +674,7 @@
                         <div class="value-icon"><i class="fas fa-coins"></i></div>
                         <div class="value-title">BUY-IN</div>
                         <div class="value-amount">R$ 100</div>
-                        <div class="value-description">ENTRADA INICIAL</div>
+                        <div class="value-description">15K EM FICHAS INICIAIS</div>
                     </div>
                     <div class="value-card">
                         <div class="value-icon"><i class="fas fa-sync-alt"></i></div>
@@ -686,7 +686,7 @@
                         <div class="value-icon"><i class="fas fa-plus-circle"></i></div>
                         <div class="value-title">ADD-ON</div>
                         <div class="value-amount">R$ 50</div>
-                        <div class="value-description">FICHAS ADICIONAIS</div>
+                        <div class="value-description">50K EM FICHAS (PÓS INTERVALO)</div>
                     </div>
                 </div>
             </div>
@@ -791,11 +791,11 @@
     <div class="modal" id="cancelModal">
         <div class="modal-content">
             <div class="modal-icon">❌</div>
-            <div class="modal-message">Digite seu nome para cancelar:</div>
+            <div class="modal-message">Digite seu nome para solicitar o cancelamento:</div>
             <input type="text" id="cancelNameInput" class="modal-input" placeholder="Seu nome" maxlength="30">
             <div class="modal-buttons">
                 <button class="btn btn-modal-cancel" onclick="closeCancelModal()">Cancelar</button>
-                <button class="btn btn-modal-confirm-cancel" onclick="confirmCancel()">Confirmar</button>
+                <button class="btn btn-modal-confirm-cancel" onclick="confirmCancel()">Solicitar Cancelamento</button>
             </div>
         </div>
     </div>
@@ -808,9 +808,12 @@
             <div class="rules-section">
                 <h3>🏆 Estrutura do Torneio</h3>
                 <ul>
-                    <li>• Buy-in: R$ 100,00 (fichas iniciais)</li>
-                    <li>• Re-buys ilimitados: R$ 25,00 (simples ou duplo)</li>
-                    <li>• Add-on opcional: R$ 50,00</li>
+                    <li>• Buy-in R$100 - 15K em Fichas Iniciais (R$50-Pote + R$30-Janta + R$20-Despesas)</li>
+                    <li>• Rebuy Simples R$25 - 15K em Fichas</li>
+                    <li>• Rebuy Duplo R$50 - 30K em Fichas</li>
+                    <li>• Addon R$50 - 50K em Fichas (pós Intervalo)</li>
+                    <li>• Blinds 15 min / 12 min / 10 min</li>
+                    <li>• BIG BLIND ANTE - Pós Intervalo</li>
                     <li>• Modalidade: Texas Hold'em No Limit</li>
                 </ul>
             </div>
@@ -832,15 +835,6 @@
                     <li>• Proibido revelar cartas em jogo</li>
                     <li>• Decisões do dealer são finais</li>
                     <li>• Diversão e amizade em primeiro lugar</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3>💰 Premiação</h3>
-                <ul>
-                    <li>• 1º Lugar: 50% do pote</li>
-                    <li>• 2º Lugar: 30% do pote</li>
-                    <li>• 3º Lugar: 20% do pote</li>
                 </ul>
             </div>
 
@@ -1091,14 +1085,12 @@
                     whatsappNumber = '5541987210685';
                 }
                 
-                const message = `Olá! Gostaria de cancelar minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${player.name}%0A*WhatsApp:* ${player.phone || 'Não informado'}%0A*Turma:* ${player.group}%0A%0A*Motivo:* Por favor, remova meu nome da lista.`;
+                const message = `Olá! Gostaria de CANCELAR minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${player.name}%0A*WhatsApp:* ${player.phone || 'Não informado'}%0A*Turma:* ${player.group}%0A%0A*Por favor, remova meu nome da lista.*`;
                 
                 window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
                 
-                confirmadosRef.child(player.id).remove().then(() => {
-                    closeCancelModal();
-                    showModal('📱', 'WhatsApp aberto para confirmar cancelamento. Sua inscrição foi removida!');
-                });
+                closeCancelModal();
+                showModal('📱', 'Solicitação de cancelamento enviada pelo WhatsApp! O admin irá remover sua inscrição.');
             } else {
                 closeCancelModal();
                 showModal('❌', 'Nome não encontrado na lista.');
