@@ -362,6 +362,11 @@
             color: #fff;
         }
 
+        .btn-confirm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .btn-cancel {
             background: linear-gradient(135deg, #d32f2f, #f44336);
             color: #fff;
@@ -372,6 +377,24 @@
             color: #ccaa00;
             border: 1px solid #ccaa00;
             margin-top: 10px;
+        }
+
+        .btn-promote {
+            background: linear-gradient(135deg, #f57c00, #ff9800);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .btn-promote:hover {
+            transform: scale(1.05);
         }
 
         .confirmed-list {
@@ -394,6 +417,11 @@
             border-radius: 10px;
             margin-bottom: 8px;
             border: 1px solid rgba(204, 170, 0, 0.1);
+        }
+
+        .player-item.waiting-list {
+            border-color: rgba(255, 152, 0, 0.3);
+            background: rgba(255, 152, 0, 0.05);
         }
 
         .player-info {
@@ -454,6 +482,12 @@
             border: 1px solid #ffb74d;
         }
 
+        .badge-waiting {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+            border: 1px solid #ffb74d;
+        }
+
         .admin-section {
             margin-top: 20px;
             padding: 15px;
@@ -481,7 +515,7 @@
 
         .admin-player-list {
             margin-top: 15px;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
         }
 
@@ -493,6 +527,19 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             margin-bottom: 5px;
+        }
+
+        .admin-player-item.waiting {
+            border-left: 3px solid #ff9800;
+        }
+
+        .admin-player-item.official {
+            border-left: 3px solid #4caf50;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 5px;
         }
 
         .btn-remove-player {
@@ -636,6 +683,23 @@
         .rules-section li:last-child {
             border-bottom: none;
         }
+
+        .status-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-official {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+        }
+
+        .status-waiting {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+        }
     </style>
 </head>
 <body>
@@ -751,13 +815,15 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-confirm" onclick="confirmPresence()">✅ Confirmar Presença</button>
+                <button class="btn btn-confirm" id="confirmBtn" onclick="confirmPresence()">✅ Confirmar Presença</button>
                 <button class="btn btn-cancel" onclick="showCancelModal()">❌ Cancelar Inscrição</button>
             </div>
 
             <div class="confirmed-list">
-                <h3>👥 Jogadores Confirmados:</h3>
-                <div id="playerList"></div>
+                <h3>👥 Jogadores Oficiais:</h3>
+                <div id="officialList"></div>
+                <h3 style="margin-top:15px; color:#ffb74d;">⏳ Lista de Espera:</h3>
+                <div id="waitingList"></div>
             </div>
 
             <button class="btn btn-rules" onclick="showRules()">📋 Regras do Evento</button>
@@ -770,7 +836,7 @@
                     </div>
                     <button class="btn btn-confirm" onclick="loginAdmin()">Entrar</button>
                     <div id="adminControls" style="display: none;">
-                        <h4 style="color: #ccaa00; margin-bottom: 10px;">Jogadores Inscritos:</h4>
+                        <h4 style="color: #ccaa00; margin-bottom: 10px;">Gerenciar Jogadores:</h4>
                         <div class="admin-player-list" id="adminPlayerList"></div>
                     </div>
                 </div>
@@ -857,8 +923,10 @@
         const database = firebase.database();
         const confirmadosRef = database.ref('confirmados');
         
+        const MAX_OFFICIAL = 40;
         let selectedDinner = '';
         let allPlayers = [];
+        let isAdmin = false;
         
         function capitalizeName(name) {
             return name
@@ -887,23 +955,35 @@
                     });
                 }
                 
+                // Sort by timestamp
                 players.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-                allPlayers = players;
                 
-                document.getElementById('confirmedCount').textContent = players.length;
+                // Separate official and waiting list
+                const official = players.filter(p => p.status !== 'waiting');
+                const waiting = players.filter(p => p.status === 'waiting');
                 
-                const newSoccerCount = players.filter(p => p.group === 'Poker New Soccer').length;
-                const quintaCount = players.filter(p => p.group === 'Poker de Quinta').length;
+                // Rebuild the list with correct statuses
+                allPlayers = [...official, ...waiting];
+                
+                // Update counts
+                const officialCount = official.length;
+                const totalCount = allPlayers.length;
+                
+                document.getElementById('confirmedCount').textContent = officialCount;
+                
+                const newSoccerCount = official.filter(p => p.group === 'Poker New Soccer').length;
+                const quintaCount = official.filter(p => p.group === 'Poker de Quinta').length;
                 document.getElementById('countNewSoccer').textContent = newSoccerCount;
                 document.getElementById('countQuinta').textContent = quintaCount;
                 
+                // Dinner votes (only from official players)
                 const dinnerVotes = {
                     'Bife a Role': { votes: 0, icon: '🥩' },
                     'Vaca Atolada': { votes: 0, icon: '🍖' },
                     'Rabada com Polenta': { votes: 0, icon: '🍲' }
                 };
                 
-                players.forEach(p => {
+                official.forEach(p => {
                     if (p.dinner && dinnerVotes[p.dinner]) {
                         dinnerVotes[p.dinner].votes++;
                     }
@@ -928,62 +1008,133 @@
                     document.getElementById('mostVotedVotes').textContent = '';
                 }
                 
-                updatePlayerList();
+                // Update the confirm button
+                const confirmBtn = document.getElementById('confirmBtn');
+                if (officialCount >= MAX_OFFICIAL) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = '⏳ Lista Cheia - Entrar na Espera';
+                } else {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = '✅ Confirmar Presença';
+                }
+                
+                updatePlayerLists(official, waiting);
                 updateAdminPlayerList();
             });
         }
         
-        function updatePlayerList() {
-            const playerList = document.getElementById('playerList');
-            playerList.innerHTML = '';
+        function updatePlayerLists(official, waiting) {
+            const officialList = document.getElementById('officialList');
+            const waitingList = document.getElementById('waitingList');
             
-            allPlayers.forEach((player, index) => {
-                const playerItem = document.createElement('div');
-                playerItem.className = 'player-item';
-                
-                const groupBadge = player.group === 'Poker New Soccer' 
-                    ? `<span class="badge badge-turma-new">${player.group}</span>`
-                    : `<span class="badge badge-turma-quinta">${player.group}</span>`;
-                
-                const dinnerBadge = player.dinner 
-                    ? `<span class="badge badge-janta">🍽️ ${player.dinner}</span>`
-                    : '';
-                
-                playerItem.innerHTML = `
-                    <div class="player-info">
-                        <div style="display: flex; align-items: center;">
-                            <span class="player-number">${index + 1}</span>
-                            <span class="player-name">🃏 ${player.name}</span>
-                        </div>
-                        ${player.phone ? `<span style="color: #25D366; font-size: 12px;"><i class="fab fa-whatsapp"></i> ${player.phone}</span>` : ''}
-                    </div>
-                    <div class="badge-container">
-                        ${groupBadge}
-                        ${dinnerBadge}
-                    </div>
-                `;
-                playerList.appendChild(playerItem);
+            officialList.innerHTML = '';
+            waitingList.innerHTML = '';
+            
+            official.forEach((player, index) => {
+                const playerItem = createPlayerItem(player, index + 1, false);
+                officialList.appendChild(playerItem);
             });
+            
+            waiting.forEach((player, index) => {
+                const playerItem = createPlayerItem(player, index + 1, true);
+                waitingList.appendChild(playerItem);
+            });
+        }
+        
+        function createPlayerItem(player, index, isWaiting) {
+            const playerItem = document.createElement('div');
+            playerItem.className = 'player-item' + (isWaiting ? ' waiting-list' : '');
+            
+            const groupBadge = player.group === 'Poker New Soccer' 
+                ? `<span class="badge badge-turma-new">${player.group}</span>`
+                : `<span class="badge badge-turma-quinta">${player.group}</span>`;
+            
+            const dinnerBadge = player.dinner 
+                ? `<span class="badge badge-janta">🍽️ ${player.dinner}</span>`
+                : '';
+            
+            const statusBadge = isWaiting 
+                ? `<span class="badge badge-waiting">⏳ Espera</span>`
+                : `<span class="badge" style="background:rgba(76,175,80,0.2);color:#81c784;border:1px solid #81c784;">✅ Oficial</span>`;
+            
+            playerItem.innerHTML = `
+                <div class="player-info">
+                    <div style="display: flex; align-items: center;">
+                        <span class="player-number">${index}</span>
+                        <span class="player-name">🃏 ${player.name}</span>
+                    </div>
+                    ${player.phone ? `<span style="color: #25D366; font-size: 12px;"><i class="fab fa-whatsapp"></i> ${player.phone}</span>` : ''}
+                </div>
+                <div class="badge-container">
+                    ${groupBadge}
+                    ${dinnerBadge}
+                    ${statusBadge}
+                </div>
+            `;
+            return playerItem;
         }
         
         function updateAdminPlayerList() {
             const adminPlayerList = document.getElementById('adminPlayerList');
             adminPlayerList.innerHTML = '';
             
-            allPlayers.forEach((player, index) => {
+            if (!isAdmin) return;
+            
+            allPlayers.forEach((player) => {
+                const isWaiting = player.status === 'waiting';
                 const adminPlayerItem = document.createElement('div');
-                adminPlayerItem.className = 'admin-player-item';
+                adminPlayerItem.className = `admin-player-item ${isWaiting ? 'waiting' : 'official'}`;
+                
+                const actions = document.createElement('div');
+                actions.className = 'admin-actions';
+                
+                if (isWaiting) {
+                    const promoteBtn = document.createElement('button');
+                    promoteBtn.className = 'btn-promote';
+                    promoteBtn.innerHTML = '⬆ Promover';
+                    promoteBtn.onclick = () => promotePlayer(player.id);
+                    actions.appendChild(promoteBtn);
+                }
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'btn-remove-player';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.onclick = () => removePlayerById(player.id);
+                actions.appendChild(removeBtn);
+                
                 adminPlayerItem.innerHTML = `
-                    <span style="font-size: 13px;">${index + 1}. ${player.name} (${player.group})</span>
-                    <button class="btn-remove-player" onclick="removePlayerById('${player.id}')" title="Remover jogador">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <span style="font-size: 13px;">
+                        ${player.name} (${player.group})
+                        ${isWaiting ? ' ⏳' : ' ✅'}
+                    </span>
                 `;
+                adminPlayerItem.appendChild(actions);
                 adminPlayerList.appendChild(adminPlayerItem);
             });
         }
         
+        function promotePlayer(playerId) {
+            if (!isAdmin) return;
+            
+            const officialCount = allPlayers.filter(p => p.status !== 'waiting').length;
+            
+            if (officialCount >= MAX_OFFICIAL) {
+                showModal('❌', 'Lista oficial já está cheia (40 jogadores)!');
+                return;
+            }
+            
+            confirmadosRef.child(playerId).update({
+                status: null // remove waiting status
+            }).then(() => {
+                showModal('✅', 'Jogador promovido para a lista oficial!');
+            }).catch((error) => {
+                console.error("Erro:", error);
+                showModal('❌', 'Erro ao promover jogador.');
+            });
+        }
+        
         function removePlayerById(playerId) {
+            if (!isAdmin) return;
             if (confirm('Tem certeza que deseja remover este jogador?')) {
                 confirmadosRef.child(playerId).remove().then(() => {
                     showModal('✅', 'Jogador removido com sucesso!');
@@ -1033,14 +1184,30 @@
                 return;
             }
             
+            // Check if name already exists
+            if (allPlayers.some(p => p.name === name)) {
+                showModal('❌', 'Este nome já está inscrito!');
+                return;
+            }
+            
+            // Check if official list is full
+            const officialCount = allPlayers.filter(p => p.status !== 'waiting').length;
+            const isWaiting = officialCount >= MAX_OFFICIAL;
+            
             const newPlayerRef = confirmadosRef.push();
-            newPlayerRef.set({
+            const playerData = {
                 name: name,
                 phone: phone,
                 group: group,
                 dinner: selectedDinner,
                 timestamp: Date.now()
-            }).then(() => {
+            };
+            
+            if (isWaiting) {
+                playerData.status = 'waiting';
+            }
+            
+            newPlayerRef.set(playerData).then(() => {
                 document.getElementById('playerName').value = '';
                 document.getElementById('playerPhone').value = '';
                 document.getElementById('playerGroup').value = '';
@@ -1048,7 +1215,12 @@
                     opt.classList.remove('selected');
                 });
                 selectedDinner = '';
-                showModal('✅', `${name}, sua presença foi confirmada!`);
+                
+                if (isWaiting) {
+                    showModal('⏳', `${name}, você foi colocado na lista de espera!`);
+                } else {
+                    showModal('✅', `${name}, sua presença foi confirmada!`);
+                }
             }).catch((error) => {
                 console.error("Erro:", error);
                 showModal('❌', 'Erro ao confirmar. Tente novamente.');
@@ -1106,6 +1278,7 @@
             const password = document.getElementById('adminPassword').value;
             
             if (password === 'poker123') {
+                isAdmin = true;
                 document.getElementById('adminControls').style.display = 'block';
                 updateAdminPlayerList();
                 showModal('✅', 'Login realizado!');
