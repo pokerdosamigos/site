@@ -1298,11 +1298,20 @@
                 }
                 updateSeatDropdown();
                 updateAdminSeatList();
+                
+                // Se o modal de assentos estiver aberto, atualiza o ticket
+                if (document.getElementById('seatModal').classList.contains('active')) {
+                    const select = document.getElementById('seatPlayerSelect');
+                    if (select.value) {
+                        showPlayerSeat();
+                    }
+                }
             });
         }
 
         function updateSeatDropdown() {
             const select = document.getElementById('seatPlayerSelect');
+            const currentValue = select.value;
             select.innerHTML = '<option value="">Selecione um jogador...</option>';
             
             const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
@@ -1325,12 +1334,30 @@
                 });
                 select.appendChild(optgroup);
             }
+            
+            // Restaura o valor selecionado se ainda existir
+            if (currentValue) {
+                const options = select.querySelectorAll('option');
+                let found = false;
+                options.forEach(opt => {
+                    if (opt.value === currentValue) {
+                        opt.selected = true;
+                        found = true;
+                    }
+                });
+                if (found) {
+                    showPlayerSeat();
+                }
+            }
         }
 
         function showPlayerSeat() {
             const select = document.getElementById('seatPlayerSelect');
             const playerName = select.value;
             const ticketDiv = document.getElementById('seatTicket');
+
+            console.log('Buscando assento para:', playerName);
+            console.log('Assentos disponíveis:', seatAssignments);
 
             if (!playerName) {
                 ticketDiv.innerHTML = `
@@ -1353,6 +1380,7 @@
                         mesa = mesaNome;
                         assento = index + 1;
                         found = true;
+                        console.log('Encontrado:', playerName, 'na', mesa, 'assento', assento);
                         break;
                     }
                 }
@@ -1406,6 +1434,12 @@
                 </div>
             `;
             document.getElementById('seatModal').classList.add('active');
+            
+            // Se houver um jogador selecionado, mostra o ticket
+            const select = document.getElementById('seatPlayerSelect');
+            if (select.value) {
+                showPlayerSeat();
+            }
         }
 
         function closeSeatModal() {
@@ -1524,6 +1558,13 @@
                     seatAssignments = updatedSeats;
                     updateAdminSeatList();
                     updateSeatDropdown();
+                    // Atualiza o ticket se o modal estiver aberto
+                    if (document.getElementById('seatModal').classList.contains('active')) {
+                        const select = document.getElementById('seatPlayerSelect');
+                        if (select.value === playerName) {
+                            showPlayerSeat();
+                        }
+                    }
                 })
                 .catch((error) => {
                     console.error("Erro ao salvar:", error);
@@ -1552,7 +1593,6 @@
                     const index = jogadores.indexOf(playerName);
                     if (index !== -1) {
                         updatedSeats[mesa][index] = null;
-                        // Remove nulls do array
                         updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null);
                         if (updatedSeats[mesa].length === 0) {
                             delete updatedSeats[mesa];
@@ -1574,6 +1614,13 @@
                     seatAssignments = updatedSeats;
                     updateAdminSeatList();
                     updateSeatDropdown();
+                    // Atualiza o ticket se o modal estiver aberto
+                    if (document.getElementById('seatModal').classList.contains('active')) {
+                        const select = document.getElementById('seatPlayerSelect');
+                        if (select.value === playerName) {
+                            showPlayerSeat();
+                        }
+                    }
                 })
                 .catch((error) => {
                     console.error("Erro:", error);
@@ -1600,6 +1647,13 @@
                                 seatAssignments = updatedSeats;
                                 updateAdminSeatList();
                                 updateSeatDropdown();
+                                // Atualiza o ticket se o modal estiver aberto
+                                if (document.getElementById('seatModal').classList.contains('active')) {
+                                    const select = document.getElementById('seatPlayerSelect');
+                                    if (select.value === jogador) {
+                                        showPlayerSeat();
+                                    }
+                                }
                             })
                             .catch((error) => {
                                 console.error("Erro:", error);
