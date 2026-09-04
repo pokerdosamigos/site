@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poker dos Amigos - Confirmação de Presença</title>
+    <title>Poker dos Amigos - Mapa de Assentos</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -379,6 +379,13 @@
             margin-top: 10px;
         }
 
+        .btn-seats {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: #fff;
+            border: 1px solid #42a5f5;
+            margin-top: 10px;
+        }
+
         .btn-promote {
             background: linear-gradient(135deg, #f57c00, #ff9800);
             color: #fff;
@@ -700,6 +707,144 @@
             background: rgba(255, 152, 0, 0.2);
             color: #ffb74d;
         }
+
+        /* Estilos do Ticket de Assento */
+        .ticket-container {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 2px solid #ccaa00;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 0 0 30px rgba(204, 170, 0, 0.2);
+        }
+
+        .ticket-container::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px dashed rgba(204, 170, 0, 0.3);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(204, 170, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .ticket-title {
+            font-family: 'Anton', sans-serif;
+            font-size: 20px;
+            color: #ccaa00;
+            letter-spacing: 2px;
+        }
+
+        .ticket-icon {
+            font-size: 28px;
+            color: #ccaa00;
+        }
+
+        .ticket-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .ticket-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .ticket-item .label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .ticket-item .value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Anton', sans-serif;
+        }
+
+        .ticket-item .value.gold {
+            color: #ccaa00;
+        }
+
+        .ticket-footer {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid rgba(204, 170, 0, 0.3);
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+        }
+
+        .ticket-player-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ccaa00;
+            text-align: center;
+            padding: 8px 0;
+            margin-bottom: 10px;
+            background: rgba(204, 170, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .seat-selector {
+            margin: 20px 0;
+        }
+
+        .seat-selector select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid rgba(204, 170, 0, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ccaa00' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        .seat-selector select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .no-seat-message {
+            text-align: center;
+            padding: 30px 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .no-seat-message i {
+            font-size: 40px;
+            color: #ccaa00;
+            margin-bottom: 15px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -783,6 +928,11 @@
                     <div class="most-voted-votes" id="mostVotedVotes"></div>
                 </div>
             </div>
+
+            <!-- BOTÃO MAPA DE ASSENTOS -->
+            <button class="btn btn-seats" onclick="openSeatModal()">
+                <i class="fas fa-chair"></i> Mapa de Assentos
+            </button>
 
             <div class="confirm-form">
                 <div class="input-group">
@@ -908,6 +1058,31 @@
         </div>
     </div>
 
+    <!-- MODAL MAPA DE ASSENTOS -->
+    <div class="modal" id="seatModal">
+        <div class="modal-content" style="max-width: 400px; width: 95%;">
+            <div class="modal-icon" style="font-size: 32px;">🪑</div>
+            <div style="font-size: 18px; font-weight: 700; color: #ccaa00; margin-bottom: 10px; font-family: 'Anton', sans-serif; letter-spacing: 1px;">
+                MAPA DE ASSENTOS
+            </div>
+            
+            <div class="seat-selector">
+                <select id="seatPlayerSelect" onchange="showPlayerSeat()">
+                    <option value="">Selecione um jogador...</option>
+                </select>
+            </div>
+
+            <div id="seatTicket">
+                <div class="no-seat-message">
+                    <i class="fas fa-chair"></i>
+                    Selecione um jogador para visualizar seu assento.
+                </div>
+            </div>
+
+            <button class="btn btn-modal-cancel" onclick="closeSeatModal()" style="margin-top: 15px;">Fechar</button>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyASHowL5Bf1WQlgaXvGjSPWRQxY-gjRWE8",
@@ -922,12 +1097,20 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const confirmadosRef = database.ref('confirmados');
+        const assentosRef = database.ref('assentos');
         
         const MAX_OFFICIAL = 40;
         let selectedDinner = '';
         let allPlayers = [];
         let isAdmin = false;
-        
+        let seatAssignments = {};
+
+        // Dados de exemplo para assentos (serão sobrescritos pelo Firebase)
+        const defaultSeats = {
+            "Mesa 1": ["João", "Maria", "Carlos", "Ana", "Pedro", "Paulo", "Lucas", "Rafael", "Felipe", "Bruno"],
+            "Mesa 2": ["Roberto", "André", "Fernando", "Ricardo", "Eduardo", "Marcelo", "Gabriel", "Thiago", "Rodrigo", "Daniel"]
+        };
+
         function capitalizeName(name) {
             return name
                 .toLowerCase()
@@ -943,7 +1126,120 @@
             element.classList.add('selected');
             selectedDinner = element.dataset.dinner;
         }
-        
+
+        function loadSeatAssignments() {
+            assentosRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    seatAssignments = data;
+                } else {
+                    // Inicializa com dados de exemplo se não houver nada no Firebase
+                    seatAssignments = defaultSeats;
+                    assentosRef.set(defaultSeats);
+                }
+                updateSeatDropdown();
+            });
+        }
+
+        function updateSeatDropdown() {
+            const select = document.getElementById('seatPlayerSelect');
+            select.innerHTML = '<option value="">Selecione um jogador...</option>';
+            
+            // Pega todos os jogadores oficiais
+            const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
+            
+            // Ordena por nome
+            officialPlayers.sort((a, b) => a.name.localeCompare(b.name));
+            
+            officialPlayers.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.name;
+                option.textContent = `${player.name} (${player.group})`;
+                select.appendChild(option);
+            });
+        }
+
+        function showPlayerSeat() {
+            const select = document.getElementById('seatPlayerSelect');
+            const playerName = select.value;
+            const ticketDiv = document.getElementById('seatTicket');
+
+            if (!playerName) {
+                ticketDiv.innerHTML = `
+                    <div class="no-seat-message">
+                        <i class="fas fa-chair"></i>
+                        Selecione um jogador para visualizar seu assento.
+                    </div>
+                `;
+                return;
+            }
+
+            let found = false;
+            let mesa = '';
+            let assento = 0;
+
+            // Procura o jogador nas mesas
+            for (const [mesaNome, jogadores] of Object.entries(seatAssignments)) {
+                const index = jogadores.indexOf(playerName);
+                if (index !== -1) {
+                    mesa = mesaNome;
+                    assento = index + 1;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                ticketDiv.innerHTML = `
+                    <div class="ticket-container">
+                        <div class="ticket-header">
+                            <span class="ticket-title">🎫 POKER DOS AMIGOS</span>
+                            <span class="ticket-icon">♠️</span>
+                        </div>
+                        <div class="ticket-player-name">${playerName}</div>
+                        <div class="ticket-body">
+                            <div class="ticket-item">
+                                <div class="label">Mesa</div>
+                                <div class="value gold">${mesa}</div>
+                            </div>
+                            <div class="ticket-item">
+                                <div class="label">Assento</div>
+                                <div class="value gold">${assento}</div>
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <i class="fas fa-check-circle" style="color: #00c853;"></i> Confirme sua presença no local
+                        </div>
+                    </div>
+                `;
+            } else {
+                ticketDiv.innerHTML = `
+                    <div class="no-seat-message">
+                        <i class="fas fa-question-circle"></i>
+                        <strong style="color: #ccaa00;">${playerName}</strong><br>
+                        Este jogador ainda não possui um assento atribuído.<br>
+                        <span style="font-size: 12px; color: #666;">Fale com o administrador para definir sua mesa.</span>
+                    </div>
+                `;
+            }
+        }
+
+        function openSeatModal() {
+            updateSeatDropdown();
+            // Limpa o ticket
+            document.getElementById('seatTicket').innerHTML = `
+                <div class="no-seat-message">
+                    <i class="fas fa-chair"></i>
+                    Selecione um jogador para visualizar seu assento.
+                </div>
+            `;
+            document.getElementById('seatModal').classList.add('active');
+        }
+
+        function closeSeatModal() {
+            document.getElementById('seatModal').classList.remove('active');
+        }
+
         function loadConfirmedPlayers() {
             confirmadosRef.on('value', (snapshot) => {
                 const players = [];
@@ -955,28 +1251,20 @@
                     });
                 }
                 
-                // Sort by timestamp
                 players.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
                 
-                // Separate official and waiting list
                 const official = players.filter(p => p.status !== 'waiting');
                 const waiting = players.filter(p => p.status === 'waiting');
                 
-                // Rebuild the list with correct statuses
                 allPlayers = [...official, ...waiting];
                 
-                // Update counts
-                const officialCount = official.length;
-                const totalCount = allPlayers.length;
-                
-                document.getElementById('confirmedCount').textContent = officialCount;
+                document.getElementById('confirmedCount').textContent = official.length;
                 
                 const newSoccerCount = official.filter(p => p.group === 'Poker New Soccer').length;
                 const quintaCount = official.filter(p => p.group === 'Poker de Quinta').length;
                 document.getElementById('countNewSoccer').textContent = newSoccerCount;
                 document.getElementById('countQuinta').textContent = quintaCount;
                 
-                // Dinner votes (only from official players)
                 const dinnerVotes = {
                     'Bife a Role': { votes: 0, icon: '🥩' },
                     'Vaca Atolada': { votes: 0, icon: '🍖' },
@@ -1008,9 +1296,8 @@
                     document.getElementById('mostVotedVotes').textContent = '';
                 }
                 
-                // Update the confirm button
                 const confirmBtn = document.getElementById('confirmBtn');
-                if (officialCount >= MAX_OFFICIAL) {
+                if (official.length >= MAX_OFFICIAL) {
                     confirmBtn.disabled = true;
                     confirmBtn.textContent = '⏳ Lista Cheia - Entrar na Espera';
                 } else {
@@ -1020,6 +1307,7 @@
                 
                 updatePlayerLists(official, waiting);
                 updateAdminPlayerList();
+                updateSeatDropdown();
             });
         }
         
@@ -1124,7 +1412,7 @@
             }
             
             confirmadosRef.child(playerId).update({
-                status: null // remove waiting status
+                status: null
             }).then(() => {
                 showModal('✅', 'Jogador promovido para a lista oficial!');
             }).catch((error) => {
@@ -1184,13 +1472,11 @@
                 return;
             }
             
-            // Check if name already exists
             if (allPlayers.some(p => p.name === name)) {
                 showModal('❌', 'Este nome já está inscrito!');
                 return;
             }
             
-            // Check if official list is full
             const officialCount = allPlayers.filter(p => p.status !== 'waiting').length;
             const isWaiting = officialCount >= MAX_OFFICIAL;
             
@@ -1304,7 +1590,16 @@
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
         }
-        
+
+        // Fechar modal de assentos ao clicar fora
+        document.getElementById('seatModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSeatModal();
+            }
+        });
+
+        // Inicialização
+        loadSeatAssignments();
         loadConfirmedPlayers();
     </script>
 </body>
