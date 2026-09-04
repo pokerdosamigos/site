@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poker dos Amigos</title>
+    <title>Poker dos Amigos - Mapa de Assentos</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -744,102 +744,137 @@
             color: #ffb74d;
         }
 
-        /* Estilos do Ticket de Assento */
+        /* ESTILOS DO TICKET - FUNDO BRANCO */
         .ticket-container {
-            background: linear-gradient(145deg, #1a1a2e, #16213e);
-            border: 2px solid #ccaa00;
-            border-radius: 20px;
+            background: #ffffff;
+            border-radius: 16px;
             padding: 20px;
-            margin: 20px 0;
-            position: relative;
-            box-shadow: 0 0 30px rgba(204, 170, 0, 0.2);
+            margin: 15px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .ticket-container::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            border: 1px dashed rgba(204, 170, 0, 0.3);
-            border-radius: 12px;
-            pointer-events: none;
+        .ticket-image {
+            width: 100%;
+            max-width: 120px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px auto;
+            border-radius: 8px;
         }
 
         .ticket-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid rgba(204, 170, 0, 0.3);
+            text-align: center;
+            margin-bottom: 12px;
+            border-bottom: 2px dashed #ccaa00;
             padding-bottom: 10px;
         }
 
         .ticket-title {
             font-family: 'Anton', sans-serif;
-            font-size: 20px;
-            color: #ccaa00;
+            font-size: 22px;
+            color: #1a1a1a;
             letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
-        .ticket-icon {
-            font-size: 28px;
-            color: #ccaa00;
+        .ticket-subtitle {
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .ticket-player-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: center;
+            padding: 8px 0;
+            margin: 8px 0;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border-left: 4px solid #ccaa00;
+            border-right: 4px solid #ccaa00;
         }
 
         .ticket-body {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
             padding: 10px 0;
         }
 
         .ticket-item {
             text-align: center;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+            padding: 12px 8px;
+            background: #f8f8f8;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
         }
 
         .ticket-item .label {
-            font-size: 10px;
-            color: #999;
+            font-size: 9px;
+            color: #888;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
         .ticket-item .value {
             font-size: 22px;
             font-weight: 700;
-            color: #fff;
+            color: #1a1a1a;
             font-family: 'Anton', sans-serif;
         }
 
         .ticket-item .value.gold {
-            color: #ccaa00;
+            color: #b8860b;
         }
 
         .ticket-footer {
-            margin-top: 15px;
+            margin-top: 12px;
             padding-top: 10px;
-            border-top: 2px solid rgba(204, 170, 0, 0.3);
+            border-top: 2px dashed #ccaa00;
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             color: #888;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
-        .ticket-player-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ccaa00;
+        .ticket-footer i {
+            color: #25D366;
+        }
+
+        .ticket-info {
+            font-size: 9px;
+            color: #999;
             text-align: center;
-            padding: 8px 0;
-            margin-bottom: 10px;
-            background: rgba(204, 170, 0, 0.1);
-            border-radius: 8px;
+            margin-top: 8px;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+        }
+
+        .no-seat-message {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+            font-size: 14px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .no-seat-message i {
+            font-size: 40px;
+            color: #ccaa00;
+            margin-bottom: 15px;
+            display: block;
         }
 
         .seat-selector {
@@ -849,37 +884,23 @@
         .seat-selector select {
             width: 100%;
             padding: 14px;
-            border: 2px solid rgba(204, 170, 0, 0.3);
+            border: 2px solid #ccaa00;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
+            background: #ffffff;
+            color: #1a1a1a;
             font-size: 14px;
             font-family: 'Montserrat', sans-serif;
             appearance: none;
             -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ccaa00' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8860b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 15px center;
             padding-right: 40px;
         }
 
         .seat-selector select option {
-            background: #1a1a1a;
-            color: #fff;
-        }
-
-        .no-seat-message {
-            text-align: center;
-            padding: 30px 20px;
-            color: #888;
-            font-size: 14px;
-        }
-
-        .no-seat-message i {
-            font-size: 40px;
-            color: #ccaa00;
-            margin-bottom: 15px;
-            display: block;
+            background: #ffffff;
+            color: #1a1a1a;
         }
 
         .admin-seat-form {
@@ -903,6 +924,16 @@
         .admin-seat-form .input-group input {
             padding: 10px;
             font-size: 13px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(204, 170, 0, 0.2);
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .admin-seat-form .input-group select option {
+            background: #1a1a1a;
+            color: #fff;
         }
 
         .seat-assignment-item {
@@ -1195,10 +1226,9 @@
 
     <!-- MODAL MAPA DE ASSENTOS -->
     <div class="modal" id="seatModal">
-        <div class="modal-content" style="max-width: 400px; width: 95%;">
-            <div class="modal-icon" style="font-size: 32px;">🪑</div>
+        <div class="modal-content" style="max-width: 420px; width: 95%;">
             <div style="font-size: 18px; font-weight: 700; color: #ccaa00; margin-bottom: 10px; font-family: 'Anton', sans-serif; letter-spacing: 1px;">
-                MAPA DE ASSENTOS
+                🪑 MAPA DE ASSENTOS
             </div>
             
             <div class="seat-selector">
@@ -1277,7 +1307,6 @@
             const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
             officialPlayers.sort((a, b) => a.name.localeCompare(b.name));
             
-            // Agrupa por turma
             const grouped = {};
             officialPlayers.forEach(p => {
                 if (!grouped[p.group]) grouped[p.group] = [];
@@ -1329,23 +1358,27 @@
             if (found) {
                 ticketDiv.innerHTML = `
                     <div class="ticket-container">
+                        <img src="icon-512x512.png" alt="Poker dos Amigos" class="ticket-image" onerror="this.style.display='none'">
                         <div class="ticket-header">
-                            <span class="ticket-title">🎫 POKER DOS AMIGOS</span>
-                            <span class="ticket-icon">♠️</span>
+                            <div class="ticket-title">♠️ POKER DOS AMIGOS</div>
+                            <div class="ticket-subtitle">🎫 Ticket de Assento</div>
                         </div>
                         <div class="ticket-player-name">${playerName}</div>
                         <div class="ticket-body">
                             <div class="ticket-item">
-                                <div class="label">Mesa</div>
+                                <div class="label">🪑 Mesa</div>
                                 <div class="value gold">${mesa}</div>
                             </div>
                             <div class="ticket-item">
-                                <div class="label">Assento</div>
+                                <div class="label">📍 Assento</div>
                                 <div class="value gold">${assento}</div>
                             </div>
                         </div>
                         <div class="ticket-footer">
-                            <i class="fas fa-check-circle" style="color: #00c853;"></i> Confirme sua presença no local
+                            <i class="fas fa-check-circle"></i> Confirme sua presença no local
+                        </div>
+                        <div class="ticket-info">
+                            📅 10 de Setembro • 19:00 • New Soccer
                         </div>
                     </div>
                 `;
@@ -1353,9 +1386,9 @@
                 ticketDiv.innerHTML = `
                     <div class="no-seat-message">
                         <i class="fas fa-question-circle"></i>
-                        <strong style="color: #ccaa00;">${playerName}</strong><br>
+                        <strong style="color: #b8860b;">${playerName}</strong><br>
                         Este jogador ainda não possui um assento atribuído.<br>
-                        <span style="font-size: 12px; color: #666;">Fale com o administrador para definir sua mesa.</span>
+                        <span style="font-size: 12px; color: #999;">Fale com o administrador para definir sua mesa.</span>
                     </div>
                 `;
             }
@@ -1449,7 +1482,6 @@
                 return;
             }
             
-            // Verifica se o jogador já tem assento
             for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
                 if (jogadores.includes(playerName)) {
                     showModal('❌', `${playerName} já possui um assento na ${mesa}. Remova o assento atual primeiro.`);
@@ -1457,13 +1489,11 @@
                 }
             }
             
-            // Verifica se o assento já está ocupado
             if (seatAssignments[table] && seatAssignments[table][seatNumber - 1]) {
                 showModal('❌', `Assento ${seatNumber} da ${table} já está ocupado por ${seatAssignments[table][seatNumber - 1]}.`);
                 return;
             }
             
-            // Atribui o assento
             const updatedSeats = { ...seatAssignments };
             if (!updatedSeats[table]) {
                 updatedSeats[table] = [];
@@ -1499,7 +1529,6 @@
                 const index = jogadores.indexOf(playerName);
                 if (index !== -1) {
                     updatedSeats[mesa][index] = null;
-                    // Remove o null do array
                     updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null);
                     if (updatedSeats[mesa].length === 0) {
                         delete updatedSeats[mesa];
