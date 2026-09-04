@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poker dos Amigos - Mapa de Assentos</title>
+    <title>Poker dos Amigos</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -404,6 +404,13 @@
             transform: scale(1.05);
         }
 
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+            width: auto;
+            margin: 0;
+        }
+
         .confirmed-list {
             margin-top: 20px;
         }
@@ -547,6 +554,7 @@
         .admin-actions {
             display: flex;
             gap: 5px;
+            flex-wrap: wrap;
         }
 
         .btn-remove-player {
@@ -567,6 +575,25 @@
         .btn-remove-player:hover {
             background: #f44336;
             transform: scale(1.1);
+        }
+
+        .btn-seat-manage {
+            background: #1565c0;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .btn-seat-manage:hover {
+            background: #1e88e5;
+            transform: scale(1.05);
         }
 
         .modal {
@@ -591,9 +618,11 @@
             border-radius: 20px;
             padding: 30px;
             width: 90%;
-            max-width: 350px;
+            max-width: 400px;
             text-align: center;
             border: 2px solid rgba(204, 170, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-icon {
@@ -628,11 +657,13 @@
         .modal-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .modal-buttons .btn {
             flex: 1;
             margin-bottom: 0;
+            min-width: 100px;
         }
 
         .btn-modal-cancel {
@@ -643,6 +674,11 @@
 
         .btn-modal-confirm-cancel {
             background: linear-gradient(135deg, #d32f2f, #f44336);
+            color: #fff;
+        }
+
+        .btn-modal-save {
+            background: linear-gradient(135deg, #00c853, #00e676);
             color: #fff;
         }
 
@@ -807,7 +843,7 @@
         }
 
         .seat-selector {
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .seat-selector select {
@@ -844,6 +880,59 @@
             color: #ccaa00;
             margin-bottom: 15px;
             display: block;
+        }
+
+        .admin-seat-form {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid rgba(204, 170, 0, 0.15);
+        }
+
+        .admin-seat-form .input-group {
+            margin-bottom: 10px;
+        }
+
+        .admin-seat-form .input-group label {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .admin-seat-form .input-group select,
+        .admin-seat-form .input-group input {
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .seat-assignment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .seat-assignment-item .seat-info {
+            color: #ccaa00;
+            font-weight: 600;
+        }
+
+        .btn-remove-seat {
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .btn-remove-seat:hover {
+            background: #f44336;
         }
     </style>
 </head>
@@ -988,6 +1077,52 @@
                     <div id="adminControls" style="display: none;">
                         <h4 style="color: #ccaa00; margin-bottom: 10px;">Gerenciar Jogadores:</h4>
                         <div class="admin-player-list" id="adminPlayerList"></div>
+                        
+                        <h4 style="color: #ccaa00; margin: 20px 0 10px;">Gerenciar Assentos:</h4>
+                        <div id="adminSeatControls">
+                            <div class="admin-seat-form">
+                                <div class="input-group">
+                                    <label>Selecione a Turma</label>
+                                    <select id="adminSeatGroup" onchange="updateAdminSeatPlayers()">
+                                        <option value="">Todas as Turmas</option>
+                                        <option value="Poker New Soccer">Poker New Soccer</option>
+                                        <option value="Poker de Quinta">Poker de Quinta</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Jogador</label>
+                                    <select id="adminSeatPlayer">
+                                        <option value="">Selecione um jogador</option>
+                                    </select>
+                                </div>
+                                <div class="input-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <label>Mesa</label>
+                                        <select id="adminSeatTable">
+                                            <option value="Mesa 1">Mesa 1</option>
+                                            <option value="Mesa 2">Mesa 2</option>
+                                            <option value="Mesa 3">Mesa 3</option>
+                                            <option value="Mesa 4">Mesa 4</option>
+                                            <option value="Mesa 5">Mesa 5</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Assento</label>
+                                        <input type="number" id="adminSeatNumber" min="1" max="10" placeholder="1-10">
+                                    </div>
+                                </div>
+                                <button class="btn btn-modal-save btn-small" onclick="assignSeat()">
+                                    <i class="fas fa-save"></i> Atribuir Assento
+                                </button>
+                                <button class="btn btn-cancel btn-small" onclick="clearPlayerSeat()" style="margin-top: 5px;">
+                                    <i class="fas fa-trash"></i> Remover Assento
+                                </button>
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <h5 style="color: #aaa; font-size: 12px; margin-bottom: 8px;">Assentos Atuais:</h5>
+                                <div id="adminSeatList"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1105,12 +1240,6 @@
         let isAdmin = false;
         let seatAssignments = {};
 
-        // Dados de exemplo para assentos (serão sobrescritos pelo Firebase)
-        const defaultSeats = {
-            "Mesa 1": ["João", "Maria", "Carlos", "Ana", "Pedro", "Paulo", "Lucas", "Rafael", "Felipe", "Bruno"],
-            "Mesa 2": ["Roberto", "André", "Fernando", "Ricardo", "Eduardo", "Marcelo", "Gabriel", "Thiago", "Rodrigo", "Daniel"]
-        };
-
         function capitalizeName(name) {
             return name
                 .toLowerCase()
@@ -1133,11 +1262,11 @@
                 if (data) {
                     seatAssignments = data;
                 } else {
-                    // Inicializa com dados de exemplo se não houver nada no Firebase
-                    seatAssignments = defaultSeats;
-                    assentosRef.set(defaultSeats);
+                    seatAssignments = {};
+                    assentosRef.set({});
                 }
                 updateSeatDropdown();
+                updateAdminSeatList();
             });
         }
 
@@ -1145,18 +1274,27 @@
             const select = document.getElementById('seatPlayerSelect');
             select.innerHTML = '<option value="">Selecione um jogador...</option>';
             
-            // Pega todos os jogadores oficiais
             const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
-            
-            // Ordena por nome
             officialPlayers.sort((a, b) => a.name.localeCompare(b.name));
             
-            officialPlayers.forEach(player => {
-                const option = document.createElement('option');
-                option.value = player.name;
-                option.textContent = `${player.name} (${player.group})`;
-                select.appendChild(option);
+            // Agrupa por turma
+            const grouped = {};
+            officialPlayers.forEach(p => {
+                if (!grouped[p.group]) grouped[p.group] = [];
+                grouped[p.group].push(p);
             });
+
+            for (const [group, players] of Object.entries(grouped)) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = group;
+                players.forEach(player => {
+                    const option = document.createElement('option');
+                    option.value = player.name;
+                    option.textContent = player.name;
+                    optgroup.appendChild(option);
+                });
+                select.appendChild(optgroup);
+            }
         }
 
         function showPlayerSeat() {
@@ -1178,7 +1316,6 @@
             let mesa = '';
             let assento = 0;
 
-            // Procura o jogador nas mesas
             for (const [mesaNome, jogadores] of Object.entries(seatAssignments)) {
                 const index = jogadores.indexOf(playerName);
                 if (index !== -1) {
@@ -1226,7 +1363,6 @@
 
         function openSeatModal() {
             updateSeatDropdown();
-            // Limpa o ticket
             document.getElementById('seatTicket').innerHTML = `
                 <div class="no-seat-message">
                     <i class="fas fa-chair"></i>
@@ -1238,6 +1374,176 @@
 
         function closeSeatModal() {
             document.getElementById('seatModal').classList.remove('active');
+        }
+
+        // Funções Admin de Assentos
+        function updateAdminSeatPlayers() {
+            const groupSelect = document.getElementById('adminSeatGroup');
+            const playerSelect = document.getElementById('adminSeatPlayer');
+            const selectedGroup = groupSelect.value;
+            
+            playerSelect.innerHTML = '<option value="">Selecione um jogador</option>';
+            
+            const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
+            let filtered = officialPlayers;
+            
+            if (selectedGroup) {
+                filtered = officialPlayers.filter(p => p.group === selectedGroup);
+            }
+            
+            filtered.sort((a, b) => a.name.localeCompare(b.name));
+            
+            filtered.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.name;
+                option.textContent = `${player.name} (${player.group})`;
+                playerSelect.appendChild(option);
+            });
+        }
+
+        function updateAdminSeatList() {
+            const listDiv = document.getElementById('adminSeatList');
+            listDiv.innerHTML = '';
+            
+            if (!isAdmin) return;
+            
+            let hasSeats = false;
+            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
+                if (jogadores && jogadores.length > 0) {
+                    hasSeats = true;
+                    jogadores.forEach((jogador, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'seat-assignment-item';
+                        item.innerHTML = `
+                            <span>${jogador}</span>
+                            <span class="seat-info">${mesa} - Assento ${index + 1}</span>
+                            <button class="btn-remove-seat" onclick="removeSeat('${mesa}', '${jogador}')">✕</button>
+                        `;
+                        listDiv.appendChild(item);
+                    });
+                }
+            }
+            
+            if (!hasSeats) {
+                listDiv.innerHTML = '<p style="color: #666; font-size: 12px; text-align: center;">Nenhum assento atribuído ainda.</p>';
+            }
+        }
+
+        function assignSeat() {
+            if (!isAdmin) {
+                showModal('❌', 'Você precisa estar logado como admin.');
+                return;
+            }
+            
+            const playerName = document.getElementById('adminSeatPlayer').value;
+            const table = document.getElementById('adminSeatTable').value;
+            const seatNumber = parseInt(document.getElementById('adminSeatNumber').value);
+            
+            if (!playerName) {
+                showModal('❌', 'Selecione um jogador.');
+                return;
+            }
+            
+            if (!seatNumber || seatNumber < 1 || seatNumber > 10) {
+                showModal('❌', 'Digite um número de assento válido (1-10).');
+                return;
+            }
+            
+            // Verifica se o jogador já tem assento
+            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
+                if (jogadores.includes(playerName)) {
+                    showModal('❌', `${playerName} já possui um assento na ${mesa}. Remova o assento atual primeiro.`);
+                    return;
+                }
+            }
+            
+            // Verifica se o assento já está ocupado
+            if (seatAssignments[table] && seatAssignments[table][seatNumber - 1]) {
+                showModal('❌', `Assento ${seatNumber} da ${table} já está ocupado por ${seatAssignments[table][seatNumber - 1]}.`);
+                return;
+            }
+            
+            // Atribui o assento
+            const updatedSeats = { ...seatAssignments };
+            if (!updatedSeats[table]) {
+                updatedSeats[table] = [];
+            }
+            updatedSeats[table][seatNumber - 1] = playerName;
+            
+            assentosRef.set(updatedSeats).then(() => {
+                showModal('✅', `${playerName} atribuído à ${table}, Assento ${seatNumber}!`);
+                document.getElementById('adminSeatNumber').value = '';
+            }).catch((error) => {
+                console.error("Erro:", error);
+                showModal('❌', 'Erro ao atribuir assento.');
+            });
+        }
+
+        function clearPlayerSeat() {
+            if (!isAdmin) {
+                showModal('❌', 'Você precisa estar logado como admin.');
+                return;
+            }
+            
+            const playerName = document.getElementById('adminSeatPlayer').value;
+            
+            if (!playerName) {
+                showModal('❌', 'Selecione um jogador.');
+                return;
+            }
+            
+            let found = false;
+            const updatedSeats = { ...seatAssignments };
+            
+            for (const [mesa, jogadores] of Object.entries(updatedSeats)) {
+                const index = jogadores.indexOf(playerName);
+                if (index !== -1) {
+                    updatedSeats[mesa][index] = null;
+                    // Remove o null do array
+                    updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null);
+                    if (updatedSeats[mesa].length === 0) {
+                        delete updatedSeats[mesa];
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                showModal('❌', `${playerName} não possui um assento atribuído.`);
+                return;
+            }
+            
+            assentosRef.set(updatedSeats).then(() => {
+                showModal('✅', `Assento de ${playerName} removido com sucesso!`);
+            }).catch((error) => {
+                console.error("Erro:", error);
+                showModal('❌', 'Erro ao remover assento.');
+            });
+        }
+
+        function removeSeat(mesa, jogador) {
+            if (!isAdmin) return;
+            
+            if (confirm(`Remover ${jogador} da ${mesa}?`)) {
+                const updatedSeats = { ...seatAssignments };
+                if (updatedSeats[mesa]) {
+                    const index = updatedSeats[mesa].indexOf(jogador);
+                    if (index !== -1) {
+                        updatedSeats[mesa][index] = null;
+                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null);
+                        if (updatedSeats[mesa].length === 0) {
+                            delete updatedSeats[mesa];
+                        }
+                        assentosRef.set(updatedSeats).then(() => {
+                            showModal('✅', `${jogador} removido da ${mesa}.`);
+                        }).catch((error) => {
+                            console.error("Erro:", error);
+                            showModal('❌', 'Erro ao remover assento.');
+                        });
+                    }
+                }
+            }
         }
 
         function loadConfirmedPlayers() {
@@ -1308,6 +1614,7 @@
                 updatePlayerLists(official, waiting);
                 updateAdminPlayerList();
                 updateSeatDropdown();
+                updateAdminSeatPlayers();
             });
         }
         
@@ -1567,6 +1874,8 @@
                 isAdmin = true;
                 document.getElementById('adminControls').style.display = 'block';
                 updateAdminPlayerList();
+                updateAdminSeatPlayers();
+                updateAdminSeatList();
                 showModal('✅', 'Login realizado!');
             } else {
                 showModal('❌', 'Senha incorreta!');
