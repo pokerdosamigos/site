@@ -1291,9 +1291,10 @@
                 const data = snapshot.val();
                 if (data) {
                     seatAssignments = data;
+                    console.log('Assentos carregados:', seatAssignments);
                 } else {
                     seatAssignments = {};
-                    assentosRef.set({});
+                    console.log('Nenhum assento encontrado, inicializando vazio');
                 }
                 updateSeatDropdown();
                 updateAdminSeatList();
@@ -1346,12 +1347,14 @@
             let assento = 0;
 
             for (const [mesaNome, jogadores] of Object.entries(seatAssignments)) {
-                const index = jogadores.indexOf(playerName);
-                if (index !== -1) {
-                    mesa = mesaNome;
-                    assento = index + 1;
-                    found = true;
-                    break;
+                if (jogadores && Array.isArray(jogadores)) {
+                    const index = jogadores.indexOf(playerName);
+                    if (index !== -1) {
+                        mesa = mesaNome;
+                        assento = index + 1;
+                        found = true;
+                        break;
+                    }
                 }
             }
 
@@ -1442,17 +1445,19 @@
             
             let hasSeats = false;
             for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                if (jogadores && jogadores.length > 0) {
+                if (jogadores && Array.isArray(jogadores) && jogadores.length > 0) {
                     hasSeats = true;
                     jogadores.forEach((jogador, index) => {
-                        const item = document.createElement('div');
-                        item.className = 'seat-assignment-item';
-                        item.innerHTML = `
-                            <span>${jogador}</span>
-                            <span class="seat-info">${mesa} - Assento ${index + 1}</span>
-                            <button class="btn-remove-seat" onclick="removeSeat('${mesa}', '${jogador}')">✕</button>
-                        `;
-                        listDiv.appendChild(item);
+                        if (jogador) {
+                            const item = document.createElement('div');
+                            item.className = 'seat-assignment-item';
+                            item.innerHTML = `
+                                <span>${jogador}</span>
+                                <span class="seat-info">${mesa} - Assento ${index + 1}</span>
+                                <button class="btn-remove-seat" onclick="removeSeat('${mesa}', '${jogador}')">✕</button>
+                            `;
+                            listDiv.appendChild(item);
+                        }
                     });
                 }
             }
@@ -1482,31 +1487,48 @@
                 return;
             }
             
+            // Verifica se o jogador já tem assento
             for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                if (jogadores.includes(playerName)) {
+                if (jogadores && Array.isArray(jogadores) && jogadores.includes(playerName)) {
                     showModal('❌', `${playerName} já possui um assento na ${mesa}. Remova o assento atual primeiro.`);
                     return;
                 }
             }
             
+            // Verifica se o assento já está ocupado
             if (seatAssignments[table] && seatAssignments[table][seatNumber - 1]) {
                 showModal('❌', `Assento ${seatNumber} da ${table} já está ocupado por ${seatAssignments[table][seatNumber - 1]}.`);
                 return;
             }
             
+            // Cria uma cópia atualizada
             const updatedSeats = { ...seatAssignments };
             if (!updatedSeats[table]) {
                 updatedSeats[table] = [];
             }
+            
+            // Garante que o array tenha o tamanho necessário
+            while (updatedSeats[table].length < seatNumber) {
+                updatedSeats[table].push(null);
+            }
+            
+            // Atribui o jogador
             updatedSeats[table][seatNumber - 1] = playerName;
             
-            assentosRef.set(updatedSeats).then(() => {
-                showModal('✅', `${playerName} atribuído à ${table}, Assento ${seatNumber}!`);
-                document.getElementById('adminSeatNumber').value = '';
-            }).catch((error) => {
-                console.error("Erro:", error);
-                showModal('❌', 'Erro ao atribuir assento.');
-            });
+            // Salva no Firebase
+            assentosRef.set(updatedSeats)
+                .then(() => {
+                    showModal('✅', `${playerName} atribuído à ${table}, Assento ${seatNumber}!`);
+                    document.getElementById('adminSeatNumber').value = '';
+                    // Atualiza a lista local
+                    seatAssignments = updatedSeats;
+                    updateAdminSeatList();
+                    updateSeatDropdown();
+                })
+                .catch((error) => {
+                    console.error("Erro ao salvar:", error);
+                    showModal('❌', 'Erro ao atribuir assento: ' + error.message);
+                });
         }
 
         function clearPlayerSeat() {
@@ -1526,15 +1548,18 @@
             const updatedSeats = { ...seatAssignments };
             
             for (const [mesa, jogadores] of Object.entries(updatedSeats)) {
-                const index = jogadores.indexOf(playerName);
-                if (index !== -1) {
-                    updatedSeats[mesa][index] = null;
-                    updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null);
-                    if (updatedSeats[mesa].length === 0) {
-                        delete updatedSeats[mesa];
+                if (jogadores && Array.isArray(jogadores)) {
+                    const index = jogadores.indexOf(playerName);
+                    if (index !== -1) {
+                        updatedSeats[mesa][index] = null;
+                        // Remove nulls do array
+                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null);
+                        if (updatedSeats[mesa].length === 0) {
+                            delete updatedSeats[mesa];
+                        }
+                        found = true;
+                        break;
                     }
-                    found = true;
-                    break;
                 }
             }
             
@@ -1543,12 +1568,17 @@
                 return;
             }
             
-            assentosRef.set(updatedSeats).then(() => {
-                showModal('✅', `Assento de ${playerName} removido com sucesso!`);
-            }).catch((error) => {
-                console.error("Erro:", error);
-                showModal('❌', 'Erro ao remover assento.');
-            });
+            assentosRef.set(updatedSeats)
+                .then(() => {
+                    showModal('✅', `Assento de ${playerName} removido com sucesso!`);
+                    seatAssignments = updatedSeats;
+                    updateAdminSeatList();
+                    updateSeatDropdown();
+                })
+                .catch((error) => {
+                    console.error("Erro:", error);
+                    showModal('❌', 'Erro ao remover assento: ' + error.message);
+                });
         }
 
         function removeSeat(mesa, jogador) {
@@ -1564,12 +1594,17 @@
                         if (updatedSeats[mesa].length === 0) {
                             delete updatedSeats[mesa];
                         }
-                        assentosRef.set(updatedSeats).then(() => {
-                            showModal('✅', `${jogador} removido da ${mesa}.`);
-                        }).catch((error) => {
-                            console.error("Erro:", error);
-                            showModal('❌', 'Erro ao remover assento.');
-                        });
+                        assentosRef.set(updatedSeats)
+                            .then(() => {
+                                showModal('✅', `${jogador} removido da ${mesa}.`);
+                                seatAssignments = updatedSeats;
+                                updateAdminSeatList();
+                                updateSeatDropdown();
+                            })
+                            .catch((error) => {
+                                console.error("Erro:", error);
+                                showModal('❌', 'Erro ao remover assento: ' + error.message);
+                            });
                     }
                 }
             }
