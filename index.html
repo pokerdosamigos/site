@@ -1405,8 +1405,10 @@
                 const data = snapshot.val();
                 if (data) {
                     seatAssignments = data;
+                    console.log('Assentos carregados:', JSON.stringify(seatAssignments));
                 } else {
                     seatAssignments = {};
+                    console.log('Nenhum assento encontrado');
                 }
                 
                 // Atualiza todas as interfaces
@@ -1416,6 +1418,9 @@
 
         // ATUALIZA TODAS AS INTERFACES
         function updateAllInterfaces() {
+            console.log('Atualizando todas as interfaces...');
+            console.log('Assentos atuais:', JSON.stringify(seatAssignments));
+            
             // Atualiza o dropdown do mapa de assentos
             updateSeatDropdown();
             
@@ -1493,6 +1498,9 @@
             const playerName = select.value;
             const ticketDiv = document.getElementById('seatTicket');
 
+            console.log('Buscando assento para:', playerName);
+            console.log('Assentos disponíveis:', JSON.stringify(seatAssignments));
+
             if (!playerName) {
                 ticketDiv.innerHTML = `
                     <div class="no-seat-message">
@@ -1515,6 +1523,7 @@
                         mesa = mesaNome;
                         assento = index + 1;
                         found = true;
+                        console.log('ENCONTRADO!', playerName, 'na', mesa, 'assento', assento);
                         break;
                     }
                 }
@@ -1561,6 +1570,7 @@
 
         // ABRE O MODAL DE ASSENTOS
         function openSeatModal() {
+            console.log('Abrindo modal de assentos...');
             // Atualiza o dropdown antes de abrir
             updateSeatDropdown();
             
@@ -1699,7 +1709,12 @@
             }
             
             // Cria uma cópia dos assentos
-            const updatedSeats = JSON.parse(JSON.stringify(seatAssignments));
+            const updatedSeats = {};
+            
+            // Copia os assentos existentes
+            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
+                updatedSeats[mesa] = [...jogadores];
+            }
             
             if (!updatedSeats[table]) {
                 updatedSeats[table] = [];
@@ -1712,13 +1727,17 @@
             
             updatedSeats[table][seatNumber - 1] = playerName;
             
+            console.log('Salvando assentos:', JSON.stringify(updatedSeats));
+            
             // Salva no Firebase
             assentosRef.set(updatedSeats)
                 .then(() => {
                     showModal('✅', `${playerName} atribuído à ${table}, Assento ${seatNumber}!`);
                     document.getElementById('adminSeatNumber').value = '';
+                    // O snapshot do Firebase vai atualizar automaticamente
                 })
                 .catch((error) => {
+                    console.error('Erro ao salvar:', error);
                     showModal('❌', 'Erro ao atribuir assento: ' + error.message);
                 });
         }
@@ -1738,7 +1757,12 @@
             }
             
             let found = false;
-            const updatedSeats = JSON.parse(JSON.stringify(seatAssignments));
+            const updatedSeats = {};
+            
+            // Copia os assentos existentes
+            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
+                updatedSeats[mesa] = [...jogadores];
+            }
             
             for (const [mesa, jogadores] of Object.entries(updatedSeats)) {
                 if (jogadores && Array.isArray(jogadores)) {
@@ -1760,11 +1784,14 @@
                 return;
             }
             
+            console.log('Removendo assento, novo estado:', JSON.stringify(updatedSeats));
+            
             assentosRef.set(updatedSeats)
                 .then(() => {
                     showModal('✅', `Assento de ${playerName} removido com sucesso!`);
                 })
                 .catch((error) => {
+                    console.error('Erro ao remover:', error);
                     showModal('❌', 'Erro ao remover assento: ' + error.message);
                 });
         }
@@ -1774,7 +1801,13 @@
             if (!isAdmin) return;
             
             if (confirm(`Remover ${jogador} da ${mesa}?`)) {
-                const updatedSeats = JSON.parse(JSON.stringify(seatAssignments));
+                const updatedSeats = {};
+                
+                // Copia os assentos existentes
+                for (const [m, jogadores] of Object.entries(seatAssignments)) {
+                    updatedSeats[m] = [...jogadores];
+                }
+                
                 if (updatedSeats[mesa]) {
                     const index = updatedSeats[mesa].indexOf(jogador);
                     if (index !== -1) {
@@ -1783,11 +1816,15 @@
                         if (updatedSeats[mesa].length === 0) {
                             delete updatedSeats[mesa];
                         }
+                        
+                        console.log('Removendo assento específico, novo estado:', JSON.stringify(updatedSeats));
+                        
                         assentosRef.set(updatedSeats)
                             .then(() => {
                                 showModal('✅', `${jogador} removido da ${mesa}.`);
                             })
                             .catch((error) => {
+                                console.error('Erro ao remover:', error);
                                 showModal('❌', 'Erro ao remover assento: ' + error.message);
                             });
                     }
@@ -1815,6 +1852,8 @@
                 const waiting = players.filter(p => p.status === 'waiting');
                 
                 allPlayers = [...official, ...waiting];
+                
+                console.log('Jogadores carregados:', allPlayers.length);
                 
                 // Atualiza contadores
                 document.getElementById('confirmedCount').textContent = official.length;
@@ -2208,6 +2247,7 @@
 
         // ============ INICIALIZAÇÃO ============
         
+        console.log('Inicializando aplicação...');
         // Carrega os dados do Firebase
         loadSeatAssignments();
         loadConfirmedPlayers();
