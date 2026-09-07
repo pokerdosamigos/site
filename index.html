@@ -1395,7 +1395,7 @@
             selectedDinner = element.dataset.dinner;
         }
 
-        // FUNÇÃO PRINCIPAL PARA CARREGAR ASSENTOS
+        // CARREGA OS ASSENTOS DO FIREBASE
         function loadSeatAssignments() {
             assentosRef.on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -1408,15 +1408,16 @@
                 }
                 
                 // Atualiza todas as interfaces
-                updateAllSeatInterfaces();
+                updateAllInterfaces();
             });
         }
 
-        // FUNÇÃO PARA ATUALIZAR TODAS AS INTERFACES DE ASSENTOS
-        function updateAllSeatInterfaces() {
+        // ATUALIZA TODAS AS INTERFACES
+        function updateAllInterfaces() {
             updateSeatDropdown();
             updateAdminSeatList();
             updateAdminSeatPlayers();
+            updatePlayerSeatDisplay();
             
             // Se o modal de assentos estiver aberto, atualiza a visualização
             const seatModal = document.getElementById('seatModal');
@@ -1428,7 +1429,7 @@
             }
         }
 
-        // ATUALIZA DROPDOWN DO MAPA DE ASSENTOS
+        // ATUALIZA O DROPDOWN DO MAPA DE ASSENTOS
         function updateSeatDropdown() {
             const select = document.getElementById('seatPlayerSelect');
             const currentValue = select.value;
@@ -1438,23 +1439,31 @@
             const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
             officialPlayers.sort((a, b) => a.name.localeCompare(b.name));
             
-            // Agrupa por turma
-            const grouped = {};
-            officialPlayers.forEach(p => {
-                if (!grouped[p.group]) grouped[p.group] = [];
-                grouped[p.group].push(p);
-            });
-
-            for (const [group, players] of Object.entries(grouped)) {
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = group;
-                players.forEach(player => {
-                    const option = document.createElement('option');
-                    option.value = player.name;
-                    option.textContent = player.name;
-                    optgroup.appendChild(option);
+            if (officialPlayers.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Nenhum jogador oficial';
+                option.disabled = true;
+                select.appendChild(option);
+            } else {
+                // Agrupa por turma
+                const grouped = {};
+                officialPlayers.forEach(p => {
+                    if (!grouped[p.group]) grouped[p.group] = [];
+                    grouped[p.group].push(p);
                 });
-                select.appendChild(optgroup);
+
+                for (const [group, players] of Object.entries(grouped)) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = group;
+                    players.forEach(player => {
+                        const option = document.createElement('option');
+                        option.value = player.name;
+                        option.textContent = player.name;
+                        optgroup.appendChild(option);
+                    });
+                    select.appendChild(optgroup);
+                }
             }
             
             // Restaura seleção anterior se existir
@@ -1547,7 +1556,9 @@
 
         // ABRE O MODAL DE ASSENTOS
         function openSeatModal() {
+            // Atualiza o dropdown antes de abrir
             updateSeatDropdown();
+            
             document.getElementById('seatTicket').innerHTML = `
                 <div class="no-seat-message">
                     <i class="fas fa-chair"></i>
@@ -1585,12 +1596,20 @@
             
             filtered.sort((a, b) => a.name.localeCompare(b.name));
             
-            filtered.forEach(player => {
+            if (filtered.length === 0) {
                 const option = document.createElement('option');
-                option.value = player.name;
-                option.textContent = `${player.name} (${player.group})`;
+                option.value = '';
+                option.textContent = 'Nenhum jogador disponível';
+                option.disabled = true;
                 playerSelect.appendChild(option);
-            });
+            } else {
+                filtered.forEach(player => {
+                    const option = document.createElement('option');
+                    option.value = player.name;
+                    option.textContent = `${player.name} (${player.group})`;
+                    playerSelect.appendChild(option);
+                });
+            }
         }
 
         // ATUALIZA A LISTA DE ASSENTOS NO ADMIN
@@ -1627,6 +1646,14 @@
             if (!hasSeats) {
                 listDiv.innerHTML = '<p style="color: #666; font-size: 12px; text-align: center;">Nenhum assento atribuído ainda.</p>';
             }
+        }
+
+        // ATUALIZA A EXIBIÇÃO DOS ASSENTOS NA LISTA DE JOGADORES
+        function updatePlayerSeatDisplay() {
+            // Atualiza a lista de jogadores
+            const official = allPlayers.filter(p => p.status !== 'waiting');
+            const waiting = allPlayers.filter(p => p.status === 'waiting');
+            updatePlayerLists(official, waiting);
         }
 
         // ATRIBUI UM ASSENTO A UM JOGADOR
@@ -1832,9 +1859,10 @@
                     confirmBtn.textContent = '✅ Confirmar Presença';
                 }
                 
+                // Atualiza todas as interfaces
                 updatePlayerLists(official, waiting);
                 updateAdminPlayerList();
-                updateAllSeatInterfaces();
+                updateAllInterfaces();
             });
         }
 
@@ -1877,9 +1905,9 @@
             let seatInfo = '';
             for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
                 if (jogadores && Array.isArray(jogadores) && jogadores.includes(player.name)) {
-                    const index = jogadores.indexOf(player.name);
+                    const idx = jogadores.indexOf(player.name);
                     hasSeat = true;
-                    seatInfo = `${mesa} - Assento ${index + 1}`;
+                    seatInfo = `${mesa} - Assento ${idx + 1}`;
                     break;
                 }
             }
@@ -1939,9 +1967,9 @@
                 let seatInfo = '';
                 for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
                     if (jogadores && Array.isArray(jogadores) && jogadores.includes(player.name)) {
-                        const index = jogadores.indexOf(player.name);
+                        const idx = jogadores.indexOf(player.name);
                         hasSeat = true;
-                        seatInfo = `${mesa} A${index + 1}`;
+                        seatInfo = `${mesa} A${idx + 1}`;
                         break;
                     }
                 }
