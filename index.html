@@ -1395,40 +1395,50 @@
             selectedDinner = element.dataset.dinner;
         }
 
+        // FUNÇÃO PRINCIPAL PARA CARREGAR ASSENTOS
         function loadSeatAssignments() {
             assentosRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     seatAssignments = data;
-                    console.log('Assentos carregados:', seatAssignments);
+                    console.log('Assentos carregados:', JSON.stringify(seatAssignments));
                 } else {
                     seatAssignments = {};
-                    console.log('Nenhum assento encontrado, inicializando vazio');
+                    console.log('Nenhum assento encontrado');
                 }
                 
-                // Atualiza todas as interfaces que dependem dos assentos
-                updateSeatDropdown();
-                updateAdminSeatList();
-                updateAdminSeatPlayers();
-                
-                // Se o modal de assentos estiver aberto, atualiza a visualização
-                if (document.getElementById('seatModal').classList.contains('active')) {
-                    const select = document.getElementById('seatPlayerSelect');
-                    if (select.value) {
-                        showPlayerSeat();
-                    }
-                }
+                // Atualiza todas as interfaces
+                updateAllSeatInterfaces();
             });
         }
 
+        // FUNÇÃO PARA ATUALIZAR TODAS AS INTERFACES DE ASSENTOS
+        function updateAllSeatInterfaces() {
+            updateSeatDropdown();
+            updateAdminSeatList();
+            updateAdminSeatPlayers();
+            
+            // Se o modal de assentos estiver aberto, atualiza a visualização
+            const seatModal = document.getElementById('seatModal');
+            if (seatModal.classList.contains('active')) {
+                const select = document.getElementById('seatPlayerSelect');
+                if (select.value) {
+                    showPlayerSeat();
+                }
+            }
+        }
+
+        // ATUALIZA DROPDOWN DO MAPA DE ASSENTOS
         function updateSeatDropdown() {
             const select = document.getElementById('seatPlayerSelect');
             const currentValue = select.value;
             select.innerHTML = '<option value="">Selecione um jogador...</option>';
             
+            // Pega apenas jogadores oficiais (não waiting)
             const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
             officialPlayers.sort((a, b) => a.name.localeCompare(b.name));
             
+            // Agrupa por turma
             const grouped = {};
             officialPlayers.forEach(p => {
                 if (!grouped[p.group]) grouped[p.group] = [];
@@ -1447,21 +1457,19 @@
                 select.appendChild(optgroup);
             }
             
+            // Restaura seleção anterior se existir
             if (currentValue) {
                 const options = select.querySelectorAll('option');
-                let found = false;
                 options.forEach(opt => {
                     if (opt.value === currentValue) {
                         opt.selected = true;
-                        found = true;
                     }
                 });
-                if (found) {
-                    showPlayerSeat();
-                }
+                showPlayerSeat();
             }
         }
 
+        // MOSTRA O TICKET DO ASSENTO
         function showPlayerSeat() {
             const select = document.getElementById('seatPlayerSelect');
             const playerName = select.value;
@@ -1484,6 +1492,7 @@
             let mesa = '';
             let assento = 0;
 
+            // Percorre todas as mesas e assentos
             for (const [mesaNome, jogadores] of Object.entries(seatAssignments)) {
                 if (jogadores && Array.isArray(jogadores)) {
                     const index = jogadores.indexOf(playerName);
@@ -1491,7 +1500,7 @@
                         mesa = mesaNome;
                         assento = index + 1;
                         found = true;
-                        console.log('Encontrado:', playerName, 'na', mesa, 'assento', assento);
+                        console.log('ENCONTRADO!', playerName, 'na', mesa, 'assento', assento);
                         break;
                     }
                 }
@@ -1536,6 +1545,7 @@
             }
         }
 
+        // ABRE O MODAL DE ASSENTOS
         function openSeatModal() {
             updateSeatDropdown();
             document.getElementById('seatTicket').innerHTML = `
@@ -1552,10 +1562,12 @@
             }
         }
 
+        // FECHA O MODAL DE ASSENTOS
         function closeSeatModal() {
             document.getElementById('seatModal').classList.remove('active');
         }
 
+        // ATUALIZA O DROPDOWN DE JOGADORES NO ADMIN
         function updateAdminSeatPlayers() {
             const groupSelect = document.getElementById('adminSeatGroup');
             const playerSelect = document.getElementById('adminSeatPlayer');
@@ -1563,6 +1575,7 @@
             
             playerSelect.innerHTML = '<option value="">Selecione um jogador</option>';
             
+            // Pega apenas jogadores oficiais (não waiting)
             const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
             let filtered = officialPlayers;
             
@@ -1580,6 +1593,7 @@
             });
         }
 
+        // ATUALIZA A LISTA DE ASSENTOS NO ADMIN
         function updateAdminSeatList() {
             const listDiv = document.getElementById('adminSeatList');
             listDiv.innerHTML = '';
@@ -1590,10 +1604,12 @@
             }
             
             let hasSeats = false;
+            
+            // Percorre todas as mesas e assentos
             for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
                 if (jogadores && Array.isArray(jogadores) && jogadores.length > 0) {
                     jogadores.forEach((jogador, index) => {
-                        if (jogador && jogador !== null) {
+                        if (jogador && jogador !== null && jogador !== '') {
                             hasSeats = true;
                             const item = document.createElement('div');
                             item.className = 'seat-assignment-item';
@@ -1613,6 +1629,7 @@
             }
         }
 
+        // ATRIBUI UM ASSENTO A UM JOGADOR
         function assignSeat() {
             if (!isAdmin) {
                 showModal('❌', 'Você precisa estar logado como admin.');
@@ -1633,6 +1650,7 @@
                 return;
             }
             
+            // Verifica se o jogador já tem um assento
             for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
                 if (jogadores && Array.isArray(jogadores) && jogadores.includes(playerName)) {
                     showModal('❌', `${playerName} já possui um assento na ${mesa}. Remova o assento atual primeiro.`);
@@ -1640,26 +1658,32 @@
                 }
             }
             
+            // Verifica se o assento está ocupado
             if (seatAssignments[table] && seatAssignments[table][seatNumber - 1]) {
                 showModal('❌', `Assento ${seatNumber} da ${table} já está ocupado por ${seatAssignments[table][seatNumber - 1]}.`);
                 return;
             }
             
-            const updatedSeats = { ...seatAssignments };
+            // Cria uma cópia dos assentos
+            const updatedSeats = JSON.parse(JSON.stringify(seatAssignments));
+            
             if (!updatedSeats[table]) {
                 updatedSeats[table] = [];
             }
             
+            // Preenche com null até o índice desejado
             while (updatedSeats[table].length < seatNumber) {
                 updatedSeats[table].push(null);
             }
             
             updatedSeats[table][seatNumber - 1] = playerName;
             
+            // Salva no Firebase
             assentosRef.set(updatedSeats)
                 .then(() => {
                     showModal('✅', `${playerName} atribuído à ${table}, Assento ${seatNumber}!`);
                     document.getElementById('adminSeatNumber').value = '';
+                    // O snapshot do Firebase vai atualizar automaticamente
                 })
                 .catch((error) => {
                     console.error("Erro ao salvar:", error);
@@ -1667,6 +1691,7 @@
                 });
         }
 
+        // REMOVE O ASSENTO DE UM JOGADOR
         function clearPlayerSeat() {
             if (!isAdmin) {
                 showModal('❌', 'Você precisa estar logado como admin.');
@@ -1681,14 +1706,15 @@
             }
             
             let found = false;
-            const updatedSeats = { ...seatAssignments };
+            const updatedSeats = JSON.parse(JSON.stringify(seatAssignments));
             
             for (const [mesa, jogadores] of Object.entries(updatedSeats)) {
                 if (jogadores && Array.isArray(jogadores)) {
                     const index = jogadores.indexOf(playerName);
                     if (index !== -1) {
                         updatedSeats[mesa][index] = null;
-                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null && p !== undefined);
+                        // Filtra null e undefined
+                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null && p !== undefined && p !== '');
                         if (updatedSeats[mesa].length === 0) {
                             delete updatedSeats[mesa];
                         }
@@ -1713,16 +1739,17 @@
                 });
         }
 
+        // REMOVE UM ASSENTO ESPECÍFICO
         function removeSeat(mesa, jogador) {
             if (!isAdmin) return;
             
             if (confirm(`Remover ${jogador} da ${mesa}?`)) {
-                const updatedSeats = { ...seatAssignments };
+                const updatedSeats = JSON.parse(JSON.stringify(seatAssignments));
                 if (updatedSeats[mesa]) {
                     const index = updatedSeats[mesa].indexOf(jogador);
                     if (index !== -1) {
                         updatedSeats[mesa][index] = null;
-                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null && p !== undefined);
+                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null && p !== undefined && p !== '');
                         if (updatedSeats[mesa].length === 0) {
                             delete updatedSeats[mesa];
                         }
@@ -1739,6 +1766,7 @@
             }
         }
 
+        // CARREGA OS JOGADORES CONFIRMADOS
         function loadConfirmedPlayers() {
             confirmadosRef.on('value', (snapshot) => {
                 const players = [];
@@ -1806,8 +1834,7 @@
                 
                 updatePlayerLists(official, waiting);
                 updateAdminPlayerList();
-                updateSeatDropdown();
-                updateAdminSeatPlayers();
+                updateAllSeatInterfaces();
             });
         }
 
@@ -1845,6 +1872,22 @@
                 ? `<span class="badge badge-waiting">⏳ Espera</span>`
                 : `<span class="badge" style="background:rgba(76,175,80,0.2);color:#81c784;border:1px solid #81c784;">✅ Oficial</span>`;
             
+            // Verifica se o jogador tem assento
+            let hasSeat = false;
+            let seatInfo = '';
+            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
+                if (jogadores && Array.isArray(jogadores) && jogadores.includes(player.name)) {
+                    const index = jogadores.indexOf(player.name);
+                    hasSeat = true;
+                    seatInfo = `${mesa} - Assento ${index + 1}`;
+                    break;
+                }
+            }
+            
+            const seatBadge = hasSeat 
+                ? `<span class="badge" style="background:rgba(33,150,243,0.2);color:#64b5f6;border:1px solid #64b5f6;">🪑 ${seatInfo}</span>`
+                : '';
+            
             playerItem.innerHTML = `
                 <div class="player-info">
                     <div style="display: flex; align-items: center;">
@@ -1857,6 +1900,7 @@
                     ${groupBadge}
                     ${dinnerBadge}
                     ${statusBadge}
+                    ${seatBadge}
                 </div>
             `;
             return playerItem;
@@ -1890,10 +1934,23 @@
                 removeBtn.onclick = () => removePlayerById(player.id);
                 actions.appendChild(removeBtn);
                 
+                // Verifica se tem assento
+                let hasSeat = false;
+                let seatInfo = '';
+                for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
+                    if (jogadores && Array.isArray(jogadores) && jogadores.includes(player.name)) {
+                        const index = jogadores.indexOf(player.name);
+                        hasSeat = true;
+                        seatInfo = `${mesa} A${index + 1}`;
+                        break;
+                    }
+                }
+                
                 adminPlayerItem.innerHTML = `
                     <span style="font-size: 13px;">
                         ${player.name} (${player.group})
                         ${isWaiting ? ' ⏳' : ' ✅'}
+                        ${hasSeat ? ` 🪑 ${seatInfo}` : ''}
                     </span>
                 `;
                 adminPlayerItem.appendChild(actions);
@@ -2093,6 +2150,7 @@
             document.getElementById('modal').classList.remove('active');
         }
 
+        // Fecha o modal de assentos ao clicar fora
         document.getElementById('seatModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeSeatModal();
