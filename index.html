@@ -1358,6 +1358,7 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyASHowL5Bf1WQlgaXvGjSPWRQxY-gjRWE8",
             authDomain: "pokerdosamigos.firebaseapp.com",
@@ -1379,6 +1380,7 @@
         let isAdmin = false;
         let seatAssignments = {};
 
+        // FUNÇÕES AUXILIARES
         function capitalizeName(name) {
             return name
                 .toLowerCase()
@@ -1395,16 +1397,16 @@
             selectedDinner = element.dataset.dinner;
         }
 
+        // ============ FUNÇÕES DE ASSENTOS ============
+        
         // CARREGA OS ASSENTOS DO FIREBASE
         function loadSeatAssignments() {
-            assentosRef.on('value', (snapshot) => {
+            assentosRef.on('value', function(snapshot) {
                 const data = snapshot.val();
                 if (data) {
                     seatAssignments = data;
-                    console.log('Assentos carregados:', JSON.stringify(seatAssignments));
                 } else {
                     seatAssignments = {};
-                    console.log('Nenhum assento encontrado');
                 }
                 
                 // Atualiza todas as interfaces
@@ -1414,10 +1416,17 @@
 
         // ATUALIZA TODAS AS INTERFACES
         function updateAllInterfaces() {
+            // Atualiza o dropdown do mapa de assentos
             updateSeatDropdown();
+            
+            // Atualiza a lista de assentos no admin
             updateAdminSeatList();
+            
+            // Atualiza o dropdown de jogadores no admin
             updateAdminSeatPlayers();
-            updatePlayerSeatDisplay();
+            
+            // Atualiza os badges de assento na lista de jogadores
+            updatePlayerSeatBadges();
             
             // Se o modal de assentos estiver aberto, atualiza a visualização
             const seatModal = document.getElementById('seatModal');
@@ -1484,9 +1493,6 @@
             const playerName = select.value;
             const ticketDiv = document.getElementById('seatTicket');
 
-            console.log('Buscando assento para:', playerName);
-            console.log('Assentos disponíveis:', seatAssignments);
-
             if (!playerName) {
                 ticketDiv.innerHTML = `
                     <div class="no-seat-message">
@@ -1509,7 +1515,6 @@
                         mesa = mesaNome;
                         assento = index + 1;
                         found = true;
-                        console.log('ENCONTRADO!', playerName, 'na', mesa, 'assento', assento);
                         break;
                     }
                 }
@@ -1577,6 +1582,8 @@
         function closeSeatModal() {
             document.getElementById('seatModal').classList.remove('active');
         }
+
+        // ============ FUNÇÕES ADMIN ============
 
         // ATUALIZA O DROPDOWN DE JOGADORES NO ADMIN
         function updateAdminSeatPlayers() {
@@ -1648,9 +1655,9 @@
             }
         }
 
-        // ATUALIZA A EXIBIÇÃO DOS ASSENTOS NA LISTA DE JOGADORES
-        function updatePlayerSeatDisplay() {
-            // Atualiza a lista de jogadores
+        // ATUALIZA OS BADGES DE ASSENTO NA LISTA DE JOGADORES
+        function updatePlayerSeatBadges() {
+            // Recria a lista de jogadores com os badges atualizados
             const official = allPlayers.filter(p => p.status !== 'waiting');
             const waiting = allPlayers.filter(p => p.status === 'waiting');
             updatePlayerLists(official, waiting);
@@ -1710,10 +1717,8 @@
                 .then(() => {
                     showModal('✅', `${playerName} atribuído à ${table}, Assento ${seatNumber}!`);
                     document.getElementById('adminSeatNumber').value = '';
-                    // O snapshot do Firebase vai atualizar automaticamente
                 })
                 .catch((error) => {
-                    console.error("Erro ao salvar:", error);
                     showModal('❌', 'Erro ao atribuir assento: ' + error.message);
                 });
         }
@@ -1740,7 +1745,6 @@
                     const index = jogadores.indexOf(playerName);
                     if (index !== -1) {
                         updatedSeats[mesa][index] = null;
-                        // Filtra null e undefined
                         updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null && p !== undefined && p !== '');
                         if (updatedSeats[mesa].length === 0) {
                             delete updatedSeats[mesa];
@@ -1761,7 +1765,6 @@
                     showModal('✅', `Assento de ${playerName} removido com sucesso!`);
                 })
                 .catch((error) => {
-                    console.error("Erro:", error);
                     showModal('❌', 'Erro ao remover assento: ' + error.message);
                 });
         }
@@ -1785,7 +1788,6 @@
                                 showModal('✅', `${jogador} removido da ${mesa}.`);
                             })
                             .catch((error) => {
-                                console.error("Erro:", error);
                                 showModal('❌', 'Erro ao remover assento: ' + error.message);
                             });
                     }
@@ -1793,9 +1795,11 @@
             }
         }
 
+        // ============ FUNÇÕES DE JOGADORES ============
+
         // CARREGA OS JOGADORES CONFIRMADOS
         function loadConfirmedPlayers() {
-            confirmadosRef.on('value', (snapshot) => {
+            confirmadosRef.on('value', function(snapshot) {
                 const players = [];
                 const data = snapshot.val();
                 
@@ -1812,6 +1816,7 @@
                 
                 allPlayers = [...official, ...waiting];
                 
+                // Atualiza contadores
                 document.getElementById('confirmedCount').textContent = official.length;
                 
                 const newSoccerCount = official.filter(p => p.group === 'Poker New Soccer').length;
@@ -1819,6 +1824,7 @@
                 document.getElementById('countNewSoccer').textContent = newSoccerCount;
                 document.getElementById('countQuinta').textContent = quintaCount;
                 
+                // Calcula janta mais votada
                 const dinnerVotes = {
                     'Bife a Role': { votes: 0, icon: '🥩' },
                     'Vaca Atolada': { votes: 0, icon: '🍖' },
@@ -1850,6 +1856,7 @@
                     document.getElementById('mostVotedVotes').textContent = '';
                 }
                 
+                // Atualiza botão de confirmação
                 const confirmBtn = document.getElementById('confirmBtn');
                 if (official.length >= MAX_OFFICIAL) {
                     confirmBtn.disabled = true;
@@ -1859,13 +1866,16 @@
                     confirmBtn.textContent = '✅ Confirmar Presença';
                 }
                 
-                // Atualiza todas as interfaces
+                // Atualiza listas
                 updatePlayerLists(official, waiting);
                 updateAdminPlayerList();
+                
+                // Atualiza interfaces de assentos
                 updateAllInterfaces();
             });
         }
 
+        // ATUALIZA AS LISTAS DE JOGADORES
         function updatePlayerLists(official, waiting) {
             const officialList = document.getElementById('officialList');
             const waitingList = document.getElementById('waitingList');
@@ -1884,6 +1894,7 @@
             });
         }
 
+        // CRIA UM ITEM DE JOGADOR
         function createPlayerItem(player, index, isWaiting) {
             const playerItem = document.createElement('div');
             playerItem.className = 'player-item' + (isWaiting ? ' waiting-list' : '');
@@ -1934,6 +1945,7 @@
             return playerItem;
         }
 
+        // ATUALIZA A LISTA DE JOGADORES NO ADMIN
         function updateAdminPlayerList() {
             const adminPlayerList = document.getElementById('adminPlayerList');
             adminPlayerList.innerHTML = '';
@@ -1986,6 +1998,7 @@
             });
         }
 
+        // PROMOVE UM JOGADOR DA LISTA DE ESPERA
         function promotePlayer(playerId) {
             if (!isAdmin) return;
             
@@ -2001,23 +2014,25 @@
             }).then(() => {
                 showModal('✅', 'Jogador promovido para a lista oficial!');
             }).catch((error) => {
-                console.error("Erro:", error);
                 showModal('❌', 'Erro ao promover jogador.');
             });
         }
 
+        // REMOVE UM JOGADOR POR ID
         function removePlayerById(playerId) {
             if (!isAdmin) return;
             if (confirm('Tem certeza que deseja remover este jogador?')) {
                 confirmadosRef.child(playerId).remove().then(() => {
                     showModal('✅', 'Jogador removido com sucesso!');
                 }).catch((error) => {
-                    console.error("Erro:", error);
                     showModal('❌', 'Erro ao remover jogador.');
                 });
             }
         }
 
+        // ============ FUNÇÕES DE FORMULÁRIO ============
+
+        // FORMATA TELEFONE
         function formatPhone(phone) {
             let numbers = phone.replace(/\D/g, '');
             numbers = numbers.slice(0, 11);
@@ -2032,6 +2047,7 @@
             this.value = formatPhone(this.value);
         });
 
+        // CONFIRMA PRESENÇA
         function confirmPresence() {
             const name = capitalizeName(document.getElementById('playerName').value.trim());
             const phone = document.getElementById('playerPhone').value.trim();
@@ -2093,10 +2109,11 @@
                     showModal('✅', `${name}, sua presença foi confirmada!`);
                 }
             }).catch((error) => {
-                console.error("Erro:", error);
                 showModal('❌', 'Erro ao confirmar. Tente novamente.');
             });
         }
+
+        // ============ FUNÇÕES DE CANCELAMENTO ============
 
         function showCancelModal() {
             document.getElementById('cancelNameInput').value = '';
@@ -2140,6 +2157,8 @@
             }
         }
 
+        // ============ FUNÇÕES DE ADMIN ============
+
         function toggleAdmin() {
             const adminForm = document.getElementById('adminForm');
             adminForm.classList.toggle('active');
@@ -2159,6 +2178,8 @@
                 showModal('❌', 'Senha incorreta!');
             }
         }
+
+        // ============ FUNÇÕES DE MODAL ============
 
         function showRules() {
             document.getElementById('rulesModal').classList.add('active');
@@ -2185,7 +2206,9 @@
             }
         });
 
-        // Inicializa os listeners
+        // ============ INICIALIZAÇÃO ============
+        
+        // Carrega os dados do Firebase
         loadSeatAssignments();
         loadConfirmedPlayers();
     </script>
