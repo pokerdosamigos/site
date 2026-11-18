@@ -1,2256 +1,710 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poker dos Amigos</title>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2c1810 50%, #1a1a1a 75%, #0a0a0a 100%);
-            min-height: 100vh;
-            padding: 16px;
-            color: #fff;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .container-card {
-            background: rgba(30, 30, 30, 0.95);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid rgba(204, 170, 0, 0.2);
-            margin-bottom: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .header h1 {
-            font-size: 36px;
-            color: #ccaa00;
-            margin-bottom: 8px;
-            letter-spacing: 2px;
-            font-family: 'Anton', sans-serif;
-            text-transform: uppercase;
-        }
-
-        .header .subtitle {
-            font-size: 13px;
-            color: #ccaa00;
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .event-details {
-            margin-bottom: 20px;
-        }
-
-        .event-details h2 {
-            font-size: 16px;
-            margin-bottom: 20px;
-            color: #ccaa00;
-            text-align: center;
-            letter-spacing: 1px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .detail-item .icon {
-            width: 30px;
-            height: 30px;
-            background: rgba(204, 170, 0, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .calendar-icon {
-            color: #ff6b6b;
-        }
-
-        .location-icon {
-            color: #ff4444;
-        }
-
-        .address-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .maps-icon {
-            color: #4285f4;
-            font-size: 24px;
-        }
-
-        .address-text {
-            color: #ccc;
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        .values-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .value-card {
-            background: linear-gradient(135deg, rgba(204, 170, 0, 0.1), rgba(180, 140, 0, 0.1));
-            border: 1px solid rgba(204, 170, 0, 0.3);
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .value-icon {
-            margin-bottom: 10px;
-            font-size: 35px;
-            color: #ccaa00;
-        }
-
-        .value-title {
-            font-size: 11px;
-            color: #ccaa00;
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .value-amount {
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .value-description {
-            font-size: 10px;
-            color: #ccc;
-            line-height: 1.4;
-        }
-
-        .message-container {
-            background: linear-gradient(135deg, rgba(204, 170, 0, 0.05), rgba(180, 140, 0, 0.05));
-            border: 1px solid rgba(204, 170, 0, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .message-text {
-            font-size: 13px;
-            line-height: 1.8;
-            color: #ddd;
-        }
-
-        .confirmed-count {
-            text-align: center;
-            margin: 20px 0;
-            padding: 25px;
-            background: linear-gradient(135deg, rgba(204, 170, 0, 0.1), rgba(180, 140, 0, 0.1));
-            border-radius: 20px;
-            border: 2px solid rgba(204, 170, 0, 0.3);
-        }
-
-        .count-number {
-            font-size: 48px;
-            color: #ccaa00;
-            margin: 10px 0;
-            font-family: 'Anton', sans-serif;
-        }
-
-        .count-label {
-            font-size: 13px;
-            color: #ccc;
-            letter-spacing: 1px;
-        }
-
-        .division-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .division-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            border: 1px solid rgba(204, 170, 0, 0.2);
-        }
-
-        .division-title {
-            font-size: 11px;
-            color: #ccaa00;
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .division-count {
-            font-size: 24px;
-            font-weight: 700;
-            color: #fff;
-            font-family: 'Anton', sans-serif;
-        }
-
-        .most-voted-dinner {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 152, 0, 0.1);
-            border: 1px solid rgba(255, 152, 0, 0.3);
-            border-radius: 12px;
-        }
-
-        .most-voted-title {
-            font-size: 11px;
-            color: #ffb74d;
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .most-voted-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffb74d;
-            font-family: 'Anton', sans-serif;
-            margin-bottom: 5px;
-        }
-
-        .most-voted-votes {
-            font-size: 13px;
-            color: #ffb74d;
-            font-weight: 500;
-        }
-
-        .confirm-form {
-            margin-top: 20px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            font-size: 12px;
-            color: #ccc;
-            margin-bottom: 10px;
-            display: block;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .input-group input,
-        .input-group select {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid rgba(204, 170, 0, 0.2);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-size: 14px;
-            font-family: 'Montserrat', sans-serif;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        .input-group select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ccaa00' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 40px;
-        }
-
-        .input-group select option {
-            background: #1a1a1a;
-            color: #fff;
-        }
-
-        .dinner-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-
-        .dinner-option {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(204, 170, 0, 0.2);
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .dinner-option.selected {
-            border-color: #ccaa00;
-            background: rgba(204, 170, 0, 0.2);
-        }
-
-        .dinner-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .dinner-name {
-            font-size: 10px;
-            color: #ccc;
-            text-transform: uppercase;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
-            font-family: 'Montserrat', sans-serif;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .btn-confirm {
-            background: linear-gradient(135deg, #00c853, #00e676);
-            color: #fff;
-        }
-
-        .btn-confirm:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-cancel {
-            background: linear-gradient(135deg, #d32f2f, #f44336);
-            color: #fff;
-        }
-
-        .btn-rules {
-            background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
-            color: #ccaa00;
-            border: 1px solid #ccaa00;
-            margin-top: 10px;
-        }
-
-        .btn-seats {
-            background: linear-gradient(135deg, #1a237e, #0d47a1);
-            color: #fff;
-            border: 1px solid #42a5f5;
-            margin-top: 10px;
-        }
-
-        .btn-promote {
-            background: linear-gradient(135deg, #f57c00, #ff9800);
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-        }
-
-        .btn-promote:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 12px;
-            width: auto;
-            margin: 0;
-        }
-
-        .confirmed-list {
-            margin-top: 20px;
-        }
-
-        .confirmed-list h3 {
-            font-size: 15px;
-            margin-bottom: 15px;
-            color: #ccaa00;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .player-item {
-            display: flex;
-            flex-direction: column;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            border: 1px solid rgba(204, 170, 0, 0.1);
-        }
-
-        .player-item.waiting-list {
-            border-color: rgba(255, 152, 0, 0.3);
-            background: rgba(255, 152, 0, 0.05);
-        }
-
-        .player-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .player-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            background: rgba(204, 170, 0, 0.2);
-            border-radius: 50%;
-            font-size: 11px;
-            font-weight: 700;
-            color: #ccaa00;
-            margin-right: 8px;
-        }
-
-        .player-name {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .badge-container {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-turma-new {
-            background: rgba(66, 133, 244, 0.2);
-            color: #4fc3f7;
-            border: 1px solid #4fc3f7;
-        }
-
-        .badge-turma-quinta {
-            background: rgba(76, 175, 80, 0.2);
-            color: #81c784;
-            border: 1px solid #81c784;
-        }
-
-        .badge-janta {
-            background: rgba(255, 152, 0, 0.2);
-            color: #ffb74d;
-            border: 1px solid #ffb74d;
-        }
-
-        .badge-waiting {
-            background: rgba(255, 152, 0, 0.2);
-            color: #ffb74d;
-            border: 1px solid #ffb74d;
-        }
-
-        .admin-section {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .admin-toggle {
-            color: #999;
-            text-align: center;
-            font-size: 13px;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .admin-form {
-            display: none;
-            margin-top: 15px;
-        }
-
-        .admin-form.active {
-            display: block;
-        }
-
-        .admin-player-list {
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .admin-player-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin-bottom: 5px;
-        }
-
-        .admin-player-item.waiting {
-            border-left: 3px solid #ff9800;
-        }
-
-        .admin-player-item.official {
-            border-left: 3px solid #4caf50;
-        }
-
-        .admin-actions {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
-        .btn-remove-player {
-            background: #d32f2f;
-            color: #fff;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .btn-remove-player:hover {
-            background: #f44336;
-            transform: scale(1.1);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a1a, #2c1810);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            border: 2px solid rgba(204, 170, 0, 0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        .modal-message {
-            font-size: 14px;
-            margin-bottom: 20px;
-            color: #ddd;
-            line-height: 1.6;
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid rgba(204, 170, 0, 0.2);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-size: 14px;
-            font-family: 'Montserrat', sans-serif;
-            margin-bottom: 15px;
-        }
-
-        .modal-input:focus {
-            outline: none;
-            border-color: #ccaa00;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .modal-buttons .btn {
-            flex: 1;
-            margin-bottom: 0;
-            min-width: 100px;
-        }
-
-        .btn-modal-cancel {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ccc;
-            border: 1px solid #ccc;
-        }
-
-        .btn-modal-confirm-cancel {
-            background: linear-gradient(135deg, #d32f2f, #f44336);
-            color: #fff;
-        }
-
-        .btn-modal-save {
-            background: linear-gradient(135deg, #00c853, #00e676);
-            color: #fff;
-        }
-
-        .rules-modal-content {
-            max-height: 80vh;
-            overflow-y: auto;
-            text-align: left;
-            padding: 25px 20px;
-        }
-
-        .rules-modal-content h2 {
-            text-align: center;
-            color: #ccaa00;
-            margin-bottom: 20px;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 22px;
-            border-bottom: 2px solid rgba(204, 170, 0, 0.3);
-            padding-bottom: 15px;
-        }
-
-        .rules-modal-content .rules-welcome {
-            background: rgba(204, 170, 0, 0.15);
-            border-left: 4px solid #ccaa00;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #f1c40f;
-            text-align: center;
-            line-height: 1.6;
-        }
-
-        .rules-section {
-            margin-bottom: 18px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 12px;
-            border: 1px solid rgba(204, 170, 0, 0.15);
-        }
-
-        .rules-section h3 {
-            color: #ccaa00;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .rules-section h3 .icon {
-            font-size: 20px;
-        }
-
-        .rules-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .rules-section li {
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 12.5px;
-            color: #ddd;
-            line-height: 1.5;
-        }
-
-        .rules-section li:last-child {
-            border-bottom: none;
-        }
-
-        .rules-section .highlight {
-            color: #ccaa00;
-            font-weight: 600;
-        }
-
-        .rules-section .highlight-red {
-            color: #e74c3c;
-            font-weight: 600;
-        }
-
-        .rules-section .highlight-green {
-            color: #2ecc71;
-            font-weight: 600;
-        }
-
-        .rules-section .highlight-blue {
-            color: #3498db;
-            font-weight: 600;
-        }
-
-        .rules-section .highlight-orange {
-            color: #f39c12;
-            font-weight: 600;
-        }
-
-        .rules-final {
-            background: rgba(204, 170, 0, 0.08);
-            border: 1px solid rgba(204, 170, 0, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        .rules-final p {
-            font-size: 13px;
-            color: #ddd;
-            line-height: 1.6;
-        }
-
-        .rules-final .final-highlight {
-            color: #f1c40f;
-            font-weight: 600;
-        }
-
-        .status-badge {
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-        }
-
-        .status-official {
-            background: rgba(76, 175, 80, 0.2);
-            color: #81c784;
-        }
-
-        .status-waiting {
-            background: rgba(255, 152, 0, 0.2);
-            color: #ffb74d;
-        }
-
-        /* ESTILOS DO TICKET - FUNDO BRANCO */
-        .ticket-container {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            max-width: 380px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .ticket-image {
-            width: 100%;
-            max-width: 120px;
-            height: auto;
-            display: block;
-            margin: 0 auto 10px auto;
-            border-radius: 8px;
-        }
-
-        .ticket-header {
-            text-align: center;
-            margin-bottom: 12px;
-            border-bottom: 2px dashed #ccaa00;
-            padding-bottom: 10px;
-        }
-
-        .ticket-title {
-            font-family: 'Anton', sans-serif;
-            font-size: 22px;
-            color: #1a1a1a;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .ticket-subtitle {
-            font-size: 11px;
-            color: #666;
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .ticket-player-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a1a;
-            text-align: center;
-            padding: 8px 0;
-            margin: 8px 0;
-            background: #f5f5f5;
-            border-radius: 8px;
-            border-left: 4px solid #ccaa00;
-            border-right: 4px solid #ccaa00;
-        }
-
-        .ticket-body {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            padding: 10px 0;
-        }
-
-        .ticket-item {
-            text-align: center;
-            padding: 12px 8px;
-            background: #f8f8f8;
-            border-radius: 10px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .ticket-item .label {
-            font-size: 9px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .ticket-item .value {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a1a;
-            font-family: 'Anton', sans-serif;
-        }
-
-        .ticket-item .value.gold {
-            color: #b8860b;
-        }
-
-        .ticket-footer {
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 2px dashed #ccaa00;
-            text-align: center;
-            font-size: 10px;
-            color: #888;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-        }
-
-        .ticket-footer i {
-            color: #25D366;
-        }
-
-        .ticket-info {
-            font-size: 9px;
-            color: #999;
-            text-align: center;
-            margin-top: 8px;
-            border-top: 1px solid #eee;
-            padding-top: 8px;
-        }
-
-        .no-seat-message {
-            text-align: center;
-            padding: 30px 20px;
-            color: #666;
-            font-size: 14px;
-            background: #f5f5f5;
-            border-radius: 12px;
-            margin: 10px 0;
-        }
-
-        .no-seat-message i {
-            font-size: 40px;
-            color: #ccaa00;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .seat-selector {
-            margin: 15px 0;
-        }
-
-        .seat-selector select {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #ccaa00;
-            border-radius: 12px;
-            background: #ffffff;
-            color: #1a1a1a;
-            font-size: 14px;
-            font-family: 'Montserrat', sans-serif;
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b8860b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 40px;
-        }
-
-        .seat-selector select option {
-            background: #ffffff;
-            color: #1a1a1a;
-        }
-
-        .admin-seat-form {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 10px;
-            border: 1px solid rgba(204, 170, 0, 0.15);
-        }
-
-        .admin-seat-form .input-group {
-            margin-bottom: 10px;
-        }
-
-        .admin-seat-form .input-group label {
-            font-size: 11px;
-            color: #aaa;
-        }
-
-        .admin-seat-form .input-group select,
-        .admin-seat-form .input-group input {
-            padding: 10px;
-            font-size: 13px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border: 1px solid rgba(204, 170, 0, 0.2);
-            border-radius: 8px;
-            width: 100%;
-        }
-
-        .admin-seat-form .input-group select option {
-            background: #1a1a1a;
-            color: #fff;
-        }
-
-        .seat-assignment-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
-            margin-bottom: 4px;
-            font-size: 12px;
-        }
-
-        .seat-assignment-item .seat-info {
-            color: #ccaa00;
-            font-weight: 600;
-        }
-
-        .btn-remove-seat {
-            background: #d32f2f;
-            color: #fff;
-            border: none;
-            padding: 2px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        .btn-remove-seat:hover {
-            background: #f44336;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Poker dos Amigos – Encerramento do Ano</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--pine:#0d2b21;--pine2:#143b2d;--card:rgba(10,32,24,.92);--wine:#9b1b30;--gold:#d4af37;--gold2:#f0d77a;--ivory:#f7f0df;--mute:#c9c2ae;--line:rgba(212,175,55,.28)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Montserrat',sans-serif;background:radial-gradient(ellipse at top,#1a4a38 0%,var(--pine) 55%,#06160f 100%) fixed;min-height:100vh;padding:0 16px 16px;color:var(--ivory)}
+.snow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.snow i{position:absolute;top:-10px;width:5px;height:5px;border-radius:50%;background:#fff;opacity:.55;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh) translateX(30px)}}
+@media (prefers-reduced-motion:reduce){.snow{display:none}.cardapio-body{transition:none!important}}
+.lights{height:26px;margin:0 -16px 6px;position:relative;z-index:1;background:radial-gradient(circle at 12px 14px,var(--wine) 4px,transparent 5px) 0 0/48px 26px,radial-gradient(circle at 36px 14px,var(--gold) 4px,transparent 5px) 0 0/48px 26px;border-top:2px solid #2a1a10}
+.container{max-width:420px;margin:0 auto;position:relative;z-index:1}
+.container-card{background:var(--card);border-radius:18px;padding:22px 20px;border:1px solid var(--line);box-shadow:0 12px 34px rgba(0,0,0,.55);margin-top:10px}
+.header{text-align:center;margin-bottom:22px}
+.header .tree{font-size:30px}
+.header h1{font-family:'Cinzel',serif;font-weight:900;font-size:32px;color:var(--gold2);letter-spacing:2px;line-height:1.1;margin:6px 0}
+.header .subtitle{font-family:'Cinzel',serif;font-size:15px;color:var(--ivory);letter-spacing:3px;font-weight:500}
+.header .orn{display:flex;align-items:center;gap:10px;color:var(--gold);margin:12px 0;font-size:12px}
+.header .orn:before,.header .orn:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.header .orn:after{transform:scaleX(-1)}
+.spirit{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.spirit span{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--line);color:var(--gold2);background:rgba(212,175,55,.07)}
+.event-details h2,.confirmed-list h3{font-family:'Cinzel',serif;font-size:15px;color:var(--gold2);text-align:center;letter-spacing:1.5px;margin-bottom:16px}
+.detail-item{display:flex;align-items:flex-start;margin-bottom:14px;font-size:14px;line-height:1.6}
+.detail-item .icon{width:32px;height:32px;background:rgba(155,27,48,.25);border:1px solid rgba(155,27,48,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:12px;flex-shrink:0;color:var(--ivory)}
+.address-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.maps-icon{color:#4285f4;font-size:22px}
+.address-text{color:var(--mute);font-size:13px;margin-top:4px}
+.values-container{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.value-card{background:rgba(212,175,55,.07);border:1px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center}
+.value-icon{font-size:26px;color:var(--gold);margin-bottom:8px}
+.value-title{font-size:11px;color:var(--gold2);font-weight:600;margin-bottom:4px}
+.value-amount{font-size:18px;font-weight:700}
+.value-description{font-size:10px;color:var(--mute);line-height:1.4;margin-top:2px}
+.message-container{background:linear-gradient(135deg,rgba(155,27,48,.22),rgba(212,175,55,.06));border:1px solid var(--line);border-radius:14px;padding:18px;margin:18px 0;text-align:center}
+.message-text{font-family:'Cinzel',serif;font-size:13px;line-height:1.8;color:var(--ivory)}
+.message-sub{font-size:12px;color:var(--mute);line-height:1.7;margin-top:10px;font-family:'Montserrat',sans-serif}
+.confirmed-count{text-align:center;margin:18px 0;padding:22px;background:rgba(212,175,55,.06);border-radius:16px;border:1px solid var(--line)}
+.count-number{font-family:'Cinzel',serif;font-weight:900;font-size:48px;color:var(--gold2);margin:6px 0}
+.count-label{font-size:12px;color:var(--mute);letter-spacing:1px}
+.division-container{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.division-card{background:rgba(255,255,255,.05);border-radius:12px;padding:12px;border:1px solid var(--line)}
+.division-title{font-size:11px;color:var(--gold2);font-weight:600;margin-bottom:4px}
+.division-count{font-family:'Cinzel',serif;font-size:24px;font-weight:700}
+.most-voted-dinner{margin-top:14px;padding:14px;background:rgba(155,27,48,.2);border:1px solid rgba(155,27,48,.55);border-radius:12px}
+.most-voted-title{font-size:11px;color:var(--gold2);font-weight:600;margin-bottom:4px}
+.most-voted-name{font-family:'Cinzel',serif;font-size:17px;font-weight:700}
+.most-voted-votes{font-size:12px;color:var(--mute)}
+.confirm-form{margin-top:20px}
+.input-group{margin-bottom:14px}
+.input-group label{font-size:12px;color:var(--mute);margin-bottom:8px;display:block;font-weight:600}
+.input-group input,.input-group select{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:14px;font-family:inherit;appearance:none;-webkit-appearance:none}
+.input-group input:focus,.input-group select:focus,.modal-input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.input-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23d4af37' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center;padding-right:40px}
+.input-group select option{background:#0d2b21;color:#fff}
+.dinner-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dinner-option{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:.25s}
+.dinner-option.selected{border-color:var(--gold);background:rgba(155,27,48,.35);box-shadow:0 0 0 1px var(--gold)}
+.dinner-icon{font-size:28px;margin-bottom:6px}
+.dinner-name{font-size:11px;color:var(--ivory);font-weight:600;line-height:1.3}
+.cardapio-toggle{width:100%;margin-top:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;background:rgba(212,175,55,.08);border:1px solid var(--line);border-radius:12px;color:var(--gold2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.cardapio-toggle i{transition:transform .3s}
+.cardapio-toggle[aria-expanded=true] i{transform:rotate(180deg)}
+.cardapio-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.cardapio-body.open{grid-template-rows:1fr}
+.cardapio-inner{overflow:hidden}
+.menu-item{margin-top:10px;padding:14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.menu-item h4{font-family:'Cinzel',serif;font-size:13px;color:var(--gold2);margin-bottom:8px}
+.menu-item ul{list-style:none}
+.menu-item li{font-size:12.5px;color:var(--ivory);padding:4px 0 4px 16px;position:relative;border-bottom:1px solid rgba(255,255,255,.06)}
+.menu-item li:last-child{border:0}
+.menu-item li:before{content:"✦";position:absolute;left:0;color:var(--gold);font-size:9px;top:7px}
+.menu-note{text-align:center;font-size:12px;color:var(--mute);margin-top:10px}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:.25s;margin-bottom:10px;font-family:inherit;letter-spacing:1px;text-transform:uppercase}
+.btn:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.btn-confirm{background:linear-gradient(135deg,#1f7a4d,#2ea36a);color:#fff;margin-top:16px}
+.btn-confirm:disabled{opacity:.5;cursor:not-allowed}
+.btn-cancel{background:linear-gradient(135deg,#7d1424,var(--wine));color:#fff}
+.btn-rules{background:transparent;color:var(--gold2);border:1px solid var(--gold);margin-top:10px}
+.btn-seats{background:linear-gradient(135deg,#a8851f,var(--gold));color:#1a1203;margin-top:4px}
+.btn-promote{background:var(--gold);color:#1a1203;border:0;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer}
+.btn-small{padding:8px 16px;font-size:12px;width:auto;margin:0}
+.confirmed-list{margin-top:22px}
+.player-item{display:flex;flex-direction:column;padding:12px;background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:8px;border:1px solid rgba(212,175,55,.12)}
+.player-item.waiting-list{border-color:rgba(255,152,0,.35);background:rgba(255,152,0,.05)}
+.player-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}
+.player-number{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:rgba(155,27,48,.5);border-radius:50%;font-size:11px;font-weight:700;margin-right:8px}
+.player-name{font-size:14px;font-weight:500}
+.badge-container{display:flex;gap:5px;flex-wrap:wrap}
+.badge{padding:4px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-turma-new{background:rgba(66,133,244,.2);color:#4fc3f7;border:1px solid #4fc3f7}
+.badge-turma-quinta{background:rgba(76,175,80,.2);color:#81c784;border:1px solid #81c784}
+.badge-janta,.badge-waiting{background:rgba(255,152,0,.2);color:#ffb74d;border:1px solid #ffb74d}
+.admin-section{margin-top:20px;padding:15px;background:rgba(255,255,255,.03);border-radius:15px;border:1px solid rgba(255,255,255,.06)}
+.admin-toggle{color:#999;text-align:center;font-size:13px;cursor:pointer;text-decoration:underline}
+.admin-form{display:none;margin-top:15px}.admin-form.active{display:block}
+.admin-player-list{margin-top:15px;max-height:300px;overflow-y:auto}
+.admin-player-item{display:flex;justify-content:space-between;align-items:center;padding:8px;background:rgba(255,255,255,.05);border-radius:8px;margin-bottom:5px;gap:6px}
+.admin-player-item.waiting{border-left:3px solid #ff9800}.admin-player-item.official{border-left:3px solid #4caf50}
+.admin-actions{display:flex;gap:5px}
+.btn-remove-player{background:#c62828;color:#fff;border:0;width:30px;height:30px;border-radius:50%;cursor:pointer}
+.admin-seat-form{background:rgba(255,255,255,.03);border-radius:12px;padding:15px;margin-top:10px;border:1px solid var(--line)}
+.admin-seat-form label{font-size:11px;color:#aaa}
+.seat-assignment-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,.03);border-radius:6px;margin-bottom:4px;font-size:12px;gap:6px}
+.seat-info{color:var(--gold2);font-weight:600}
+.btn-remove-seat{background:#c62828;color:#fff;border:0;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px}
+.footer-xmas{text-align:center;margin-top:22px;font-family:'Cinzel',serif;color:var(--gold2);font-size:13px;line-height:1.8}
+.footer-xmas small{display:block;font-family:'Montserrat',sans-serif;color:var(--mute);font-size:11px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;align-items:center;justify-content:center}
+.modal.active{display:flex}
+.modal-content{background:linear-gradient(160deg,#0d2b21,#1b0d10);border-radius:18px;padding:28px;width:90%;max-width:400px;text-align:center;border:1px solid var(--gold);max-height:90vh;overflow-y:auto}
+.modal-icon{font-size:44px;margin-bottom:16px}
+.modal-message{font-size:14px;margin-bottom:18px;line-height:1.6}
+.modal-input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:14px;font-family:inherit;margin-bottom:14px}
+.modal-buttons{display:flex;gap:10px;flex-wrap:wrap}
+.modal-buttons .btn{flex:1;margin:0;min-width:100px}
+.btn-modal-cancel{background:rgba(255,255,255,.1);color:#ccc;border:1px solid #888}
+.btn-modal-confirm-cancel{background:linear-gradient(135deg,#7d1424,var(--wine));color:#fff}
+.btn-modal-save{background:linear-gradient(135deg,#1f7a4d,#2ea36a);color:#fff}
+.rules-modal-content{text-align:left;padding:24px 18px;max-height:82vh}
+.rules-modal-content h2{font-family:'Cinzel',serif;text-align:center;color:var(--gold2);margin-bottom:18px;font-size:19px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.rules-welcome{background:rgba(155,27,48,.25);border-left:4px solid var(--gold);padding:12px 14px;border-radius:8px;margin-bottom:18px;font-size:13px;text-align:center;line-height:1.6}
+.rules-section{margin-bottom:16px;padding:14px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid var(--line)}
+.rules-section h3{color:var(--gold2);margin-bottom:8px;font-size:14px;display:flex;align-items:center;gap:8px}
+.rules-section ul{list-style:none}
+.rules-section li{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12.5px;line-height:1.5}
+.rules-section li:last-child{border:0}
+.hl{color:var(--gold2);font-weight:600}.hr{color:#ff7b7b;font-weight:600}.hg{color:#5fdc99;font-weight:600}.hb{color:#6cb8f0;font-weight:600}.ho{color:#f5a623;font-weight:600}
+.rules-final{background:rgba(212,175,55,.08);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-size:13px;line-height:1.6}
+/* ticket */
+.ticket-container{background:#fff;color:#1a1a1a;border-radius:16px;padding:20px;margin:15px auto;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.ticket-image{width:100%;max-width:120px;display:block;margin:0 auto 10px;border-radius:8px}
+.ticket-header{text-align:center;margin-bottom:12px;border-bottom:2px dashed var(--gold);padding-bottom:10px}
+.ticket-title{font-family:'Cinzel',serif;font-weight:900;font-size:20px;letter-spacing:1px}
+.ticket-subtitle{font-size:11px;color:#666;letter-spacing:1px}
+.ticket-player-name{font-size:20px;font-weight:700;text-align:center;padding:8px 0;margin:8px 0;background:#f5f5f5;border-radius:8px;border-left:4px solid var(--wine);border-right:4px solid var(--wine)}
+.ticket-body{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px 0}
+.ticket-item{text-align:center;padding:12px 8px;background:#f8f8f8;border-radius:10px;border:1px solid #e0e0e0}
+.ticket-item .label{font-size:9px;color:#888;letter-spacing:1px;font-weight:600;margin-bottom:4px}
+.ticket-item .value{font-family:'Cinzel',serif;font-size:22px;font-weight:900;color:#9b1b30}
+.ticket-footer{margin-top:12px;padding-top:10px;border-top:2px dashed var(--gold);text-align:center;font-size:10px;color:#888}
+.ticket-footer i{color:#25D366}
+.ticket-info{font-size:9px;color:#999;text-align:center;margin-top:8px;border-top:1px solid #eee;padding-top:8px}
+.no-seat-message{text-align:center;padding:26px 20px;color:#666;font-size:14px;background:#f5f5f5;border-radius:12px;margin:10px 0}
+.no-seat-message i{font-size:38px;color:var(--gold);margin-bottom:14px;display:block}
+.seat-selector select{width:100%;padding:14px;border:2px solid var(--gold);border-radius:12px;background:#fff;color:#1a1a1a;font-size:14px;font-family:inherit}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="container-card">
-            <div class="header">
-                <h1>POKER DOS AMIGOS</h1>
-                <div class="subtitle">CONFIRMAÇÃO DE PRESENÇA</div>
-            </div>
+<div class="snow" id="snow" aria-hidden="true"></div>
+<div class="lights" aria-hidden="true"></div>
+<div class="container">
+<div class="container-card">
+  <div class="header">
+    <div class="tree">🎄</div>
+    <h1>POKER DOS AMIGOS</h1>
+    <div class="subtitle">ENCERRAMENTO DO ANO</div>
+    <div class="orn">♠ ♥ ✦ ♣ ♦</div>
+    <div class="spirit"><span>🕊️ Paz</span><span>🤝 União</span><span>🙏 Gratidão</span><span>🥂 Confraternização</span></div>
+  </div>
 
-            <div class="event-details">
-                <h2>📅 DETALHES DO EVENTO</h2>
-                <div class="detail-item">
-                    <div class="icon"><i class="fas fa-calendar calendar-icon"></i></div>
-                    <div>
-                        <strong>DATA:</strong> 17 DE DEZEMBRO<br>
-                        <strong>HORÁRIO:</strong> 19:00
-                    </div>
-                </div>
-                <div class="detail-item">
-                    <div class="icon"><i class="fas fa-map-marker-alt location-icon"></i></div>
-                    <div>
-                        <strong>LOCAL:</strong> QUINTAL DO ALMIRANTE<br>
-                        <a href="https://maps.app.goo.gl/GULgn5bpEc8nDr4V7"address-link">
-                            <i class="fab fa-google maps-icon"></i>
-                            <div class="address-text">
-                                R. Alm. Gonçalves, 2045 - Rebouças, Curitiba - PR<br>
-                                
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="values-container">
-                    <div class="value-card">
-                        <div class="value-icon"><i class="fas fa-coins"></i></div>
-                        <div class="value-title">BUY-IN</div>
-                        <div class="value-amount">R$ 100</div>
-                        <div class="value-description">15K EM FICHAS INICIAIS</div>
-                    </div>
-                    <div class="value-card">
-                        <div class="value-icon"><i class="fas fa-sync-alt"></i></div>
-                        <div class="value-title">RE-BUY</div>
-                        <div class="value-amount">R$ 25</div>
-                        <div class="value-description">ILIMITADOS - SIMPLES OU DUPLO</div>
-                    </div>
-                    <div class="value-card">
-                        <div class="value-icon"><i class="fas fa-plus-circle"></i></div>
-                        <div class="value-title">ADD-ON</div>
-                        <div class="value-amount">R$ 50</div>
-                        <div class="value-description">50K EM FICHAS (PÓS INTERVALO)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="message-container">
-                <div class="message-text">
-                    "Este encontro tem como objetivo confraternizar duas turmas que têm membros em comum. O espírito do poker e a resenha devem prevalecer. É apenas um motivo para reunir os amigos, dar aquela baralhada, tomar uma cerveja e comer uma boa janta."
-                </div>
-            </div>
-
-            <div class="confirmed-count">
-                <div class="count-label">JOGADORES CONFIRMADOS</div>
-                <div class="count-number" id="confirmedCount">0</div>
-                <div class="count-label">PESSOAS</div>
-                
-                <div class="division-container">
-                    <div class="division-card">
-                        <div class="division-title">Poker New Soccer</div>
-                        <div class="division-count" id="countNewSoccer">0</div>
-                    </div>
-                    <div class="division-card">
-                        <div class="division-title">Poker de Quinta</div>
-                        <div class="division-count" id="countQuinta">0</div>
-                    </div>
-                </div>
-
-                <div class="most-voted-dinner">
-                    <div class="most-voted-title">🍽️ Janta Mais Votada</div>
-                    <div class="most-voted-name" id="mostVotedDinner">-</div>
-                    <div class="most-voted-votes" id="mostVotedVotes"></div>
-                </div>
-            </div>
-
-            <!-- BOTÃO MAPA DE ASSENTOS -->
-            <button class="btn btn-seats" onclick="openSeatModal()">
-                <i class="fas fa-chair"></i> Mapa de Assentos
-            </button>
-
-            <div class="confirm-form">
-                <div class="input-group">
-                    <input type="text" id="playerName" placeholder="👤 Digite seu nome" maxlength="30">
-                </div>
-                <div class="input-group">
-                    <input type="tel" id="playerPhone" placeholder="📱 WhatsApp (DDD + número)" maxlength="15">
-                </div>
-                <div class="input-group">
-                    <select id="playerGroup">
-                        <option value="">Selecione sua turma...</option>
-                        <option value="Poker New Soccer">Poker New Soccer</option>
-                        <option value="Poker de Quinta">Poker de Quinta</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Enquete da Janta</label>
-                    <div class="dinner-options">
-                        <div class="dinner-option" data-dinner="Bife a Role" onclick="selectDinner(this)">
-                            <div class="dinner-icon">🥩</div>
-                            <div class="dinner-name">Churrasco</div>
-                        </div>
-                        <div class="dinner-option" data-dinner="Vaca Atolada" onclick="selectDinner(this)">
-                            <div class="dinner-icon">🍖</div>
-                            <div class="dinner-name">Strogonoff de Carne</div>
-                        </div>
-                        <div class="dinner-option" data-dinner="Rabada com Polenta" onclick="selectDinner(this)">
-                            <div class="dinner-icon">🍲</div>
-                            <div class="dinner-name">Frango c/ Catupiry</div>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-confirm" id="confirmBtn" onclick="confirmPresence()">✅ Confirmar Presença</button>
-                <button class="btn btn-cancel" onclick="showCancelModal()">❌ Cancelar Inscrição</button>
-            </div>
-
-            <div class="confirmed-list">
-                <h3>👥 Jogadores Oficiais:</h3>
-                <div id="officialList"></div>
-                <h3 style="margin-top:15px; color:#ffb74d;">⏳ Lista de Espera:</h3>
-                <div id="waitingList"></div>
-            </div>
-
-            <button class="btn btn-rules" onclick="showRules()">📋 Regras do Evento</button>
-
-            <div class="admin-section">
-                <div class="admin-toggle" onclick="toggleAdmin()">🔐 Área Admin</div>
-                <div class="admin-form" id="adminForm">
-                    <div class="input-group">
-                        <input type="password" id="adminPassword" placeholder="Senha admin">
-                    </div>
-                    <button class="btn btn-confirm" onclick="loginAdmin()">Entrar</button>
-                    <div id="adminControls" style="display: none;">
-                        <h4 style="color: #ccaa00; margin-bottom: 10px;">Gerenciar Jogadores:</h4>
-                        <div class="admin-player-list" id="adminPlayerList"></div>
-                        
-                        <h4 style="color: #ccaa00; margin: 20px 0 10px;">Gerenciar Assentos:</h4>
-                        <div id="adminSeatControls">
-                            <div class="admin-seat-form">
-                                <div class="input-group">
-                                    <label>Selecione a Turma</label>
-                                    <select id="adminSeatGroup" onchange="updateAdminSeatPlayers()">
-                                        <option value="">Todas as Turmas</option>
-                                        <option value="Poker New Soccer">Poker New Soccer</option>
-                                        <option value="Poker de Quinta">Poker de Quinta</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label>Jogador</label>
-                                    <select id="adminSeatPlayer">
-                                        <option value="">Selecione um jogador</option>
-                                    </select>
-                                </div>
-                                <div class="input-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <div>
-                                        <label>Mesa</label>
-                                        <select id="adminSeatTable">
-                                            <option value="Mesa 1">Mesa 1</option>
-                                            <option value="Mesa 2">Mesa 2</option>
-                                            <option value="Mesa 3">Mesa 3</option>
-                                            <option value="Mesa 4">Mesa 4</option>
-                                            <option value="Mesa 5">Mesa 5</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label>Assento</label>
-                                        <input type="number" id="adminSeatNumber" min="1" max="10" placeholder="1-10">
-                                    </div>
-                                </div>
-                                <button class="btn btn-modal-save btn-small" onclick="assignSeat()">
-                                    <i class="fas fa-save"></i> Atribuir Assento
-                                </button>
-                                <button class="btn btn-cancel btn-small" onclick="clearPlayerSeat()" style="margin-top: 5px;">
-                                    <i class="fas fa-trash"></i> Remover Assento
-                                </button>
-                            </div>
-                            <div style="margin-top: 15px;">
-                                <h5 style="color: #aaa; font-size: 12px; margin-bottom: 8px;">Assentos Atuais:</h5>
-                                <div id="adminSeatList"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="event-details">
+    <h2>DETALHES DO EVENTO</h2>
+    <div class="detail-item"><div class="icon"><i class="fas fa-calendar"></i></div>
+      <div><strong>DATA:</strong> 17 DE DEZEMBRO<br><strong>HORÁRIO:</strong> 19:00</div></div>
+    <div class="detail-item"><div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+      <div><strong>LOCAL:</strong> QUINTAL DO ALMIRANTE<br>
+        <a href="https://maps.app.goo.gl/GULgn5bpEc8nDr4V7" class="address-link" target="_blank" rel="noopener">
+          <i class="fab fa-google maps-icon"></i>
+          <div class="address-text">R. Alm. Gonçalves, 2045 - Rebouças, Curitiba - PR</div>
+        </a></div></div>
+    <div class="values-container">
+      <div class="value-card"><div class="value-icon"><i class="fas fa-coins"></i></div><div class="value-title">BUY-IN</div><div class="value-amount">R$ 100</div><div class="value-description">15K EM FICHAS INICIAIS</div></div>
+      <div class="value-card"><div class="value-icon"><i class="fas fa-sync-alt"></i></div><div class="value-title">RE-BUY</div><div class="value-amount">R$ 25</div><div class="value-description">ILIMITADOS - SIMPLES OU DUPLO</div></div>
+      <div class="value-card"><div class="value-icon"><i class="fas fa-plus-circle"></i></div><div class="value-title">ADD-ON</div><div class="value-amount">R$ 50</div><div class="value-description">50K EM FICHAS (PÓS INTERVALO)</div></div>
     </div>
+  </div>
 
-    <!-- Modal de Sucesso/Erro -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-icon" id="modalIcon">✅</div>
-            <div class="modal-message" id="modalMessage"></div>
-            <button class="btn btn-confirm" onclick="closeModal()">OK</button>
-        </div>
+  <div class="message-container">
+    <div class="message-text">“O Natal é tempo de reunir quem a gente gosta e agradecer pelo ano que passou.”</div>
+    <div class="message-sub">Este encontro confraterniza duas turmas que têm membros em comum. O espírito do poker e a resenha devem prevalecer: um motivo para reunir os amigos, dar aquela baralhada, brindar com uma cerveja gelada e fechar o ano com uma boa janta. Boas Festas e um 2027 de muitas mãos vencedoras! 🎅</div>
+  </div>
+
+  <div class="confirmed-count">
+    <div class="count-label">JOGADORES CONFIRMADOS</div>
+    <div class="count-number" id="confirmedCount">0</div>
+    <div class="count-label">PESSOAS</div>
+    <div class="division-container">
+      <div class="division-card"><div class="division-title">Poker New Soccer</div><div class="division-count" id="countNewSoccer">0</div></div>
+      <div class="division-card"><div class="division-title">Poker de Quinta</div><div class="division-count" id="countQuinta">0</div></div>
     </div>
-
-    <!-- Modal de Cancelamento -->
-    <div class="modal" id="cancelModal">
-        <div class="modal-content">
-            <div class="modal-icon">❌</div>
-            <div class="modal-message">Digite seu nome para solicitar o cancelamento:</div>
-            <input type="text" id="cancelNameInput" class="modal-input" placeholder="Seu nome" maxlength="30">
-            <div class="modal-buttons">
-                <button class="btn btn-modal-cancel" onclick="closeCancelModal()">Cancelar</button>
-                <button class="btn btn-modal-confirm-cancel" onclick="confirmCancel()">Solicitar Cancelamento</button>
-            </div>
-        </div>
+    <div class="most-voted-dinner">
+      <div class="most-voted-title">🍽️ JANTA MAIS VOTADA</div>
+      <div class="most-voted-name" id="mostVotedDinner">-</div>
+      <div class="most-voted-votes" id="mostVotedVotes"></div>
     </div>
+  </div>
 
-    <!-- MODAL DE REGRAS -->
-    <div class="modal" id="rulesModal">
-        <div class="modal-content rules-modal-content">
-            <h2>♠️ REGULAMENTO POKER DOS AMIGOS ♥️</h2>
-            
-            <div class="rules-welcome">
-                📅 10 de Setembro • 19h • New Soccer<br>
-                <span style="font-size: 15px;">🍀 Um encontro amistoso para celebrar a amizade dos amantes do poker e de um bom flopinho!</span>
-            </div>
+  <button class="btn btn-seats" onclick="openSeatModal()"><i class="fas fa-chair"></i> Mapa de Assentos</button>
 
-            <div class="rules-section">
-                <h3><span class="icon">🧑‍⚖️</span> Organização & Dealers</h3>
-                <ul>
-                    <li><span class="highlight">Dealers profissionais:</span> Dealers profissionais serão contratados para distribuir as cartas, controlar a mesa e garantir jogo justo e transparente.</li>
-                    <li><span class="highlight">Autoridade máxima:</span> Os dealers têm autoridade máxima na mesa (troca de fichas, troco, blinds e antes).</li>
-                    <li><span class="highlight-red">Respeito obrigatório:</span> Qualquer ato de desrespeito resultará em exclusão imediata do jogador.</li>
-                    <li><span class="highlight">Dealers voluntários:</span> Em caso de atraso, a organização pode autorizar voluntários (sem remuneração) até a chegada do dealer oficial.</li>
-                    <li><span class="highlight">Método tradicional:</span> Na ausência de dealers, cada jogador dá as cartas uma vez por rodada (sentido horário).</li>
-                    <li><span class="highlight-blue">Troca de dealers:</span> Se quiserem, a cada 1 hora, os dealers trocam de mesa com intervalo de 5 minutos para manter o dinamismo.</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3><span class="icon">💰</span> Valores e Buy-In</h3>
-                <ul>
-                    <li><span class="highlight">🎟️ Buy-In + Janta + Taxa:</span> R$ 100,00 = 15.000 fichas <span style="color:#888;font-size:11px;">(R$ 30,00 janta • R$ 20,00 taxa • R$ 50,00 pote)</span></li>
-                    <li><span class="highlight-orange">🔄 Rebuys (ilimitados até o 10º nível):</span> R$ 25,00 = 15.000 fichas <span class="highlight-red">*Somente quando zerado em fichas*</span></li>
-                    <li><span class="highlight-orange">🔄 Rebuy DUPLO:</span> R$ 50,00 = 30.000 fichas <span class="highlight-red">*Somente quando zerado em fichas*</span></li>
-                    <li><span class="highlight-blue">➕ Add-on (1 por jogador):</span> R$ 50,00 = 50.000 fichas <span class="highlight-blue">*Disponível apenas no fim do 10º nível*</span></li>
-                    <li><span class="highlight-green">⏰ Bônus de chegada:</span> Quem chegar <u>antes das 19h</u> ganha <span class="highlight">+2.000 fichas</span> (apresente o ticket ao dealer).</li>
-                    <li><span style="color:#f39c12;">🍽️</span> A janta será preparada pelo Bruxo da Cozinha! – o valor já está incluso no buy-in. Quem optar por não comer, paga o mesmo valor.</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3><span class="icon">♣️</span> O Jogo & Dinâmica da Mesa</h3>
-                <ul>
-                    <li><span class="highlight">Balanceamento:</span> Mesas equilibradas com integrantes de cada turma (Poker New Soccer e Poker de Quinta).</li>
-                    <li><span class="highlight">Cartas visíveis:</span> Mantenha as cartas sobre a mesa, à frente da pilha de fichas.</li>
-                    <li><span class="highlight-red">Tempo de decisão:</span> 30 segundos – se não agir, é <span class="highlight-red">FOLD</span>.</li>
-                    <li><span class="highlight">Fichas:</span> Sempre sobre a mesa, com as de maior valor na frente.</li>
-                    <li><span class="highlight">Mostrou para um, mostrou para todos:</span> Se mostrar sua carta a alguém, deve mostrar a todos.</li>
-                    <li><span class="highlight-red">Ausência na distribuição:</span> Se não estiver na mesa quando a 2ª carta for distribuída, a mão é descartada.</li>
-                    <li><span class="highlight">Sit-out:</span> Jogadores ausentes pagam blinds normalmente e o dealer gerencia suas fichas.</li>
-                    <li><span class="highlight">Aposta em movimento único:</span> Apostas em múltiplos movimentos sem declaração verbal serão desconsideradas.</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3><span class="icon">⏳</span> Blinds & Balanceamento</h3>
-                <ul>
-                    <li><span class="highlight">Aumento dos blinds:</span> 13 minutos por nível (início) → 10 min → 8 min (após intervalo).</li>
-                    <li>Alerta sonoro indica o novo nível.</li>
-                    <li>Ao final do 10º nível: jogam-se <span class="highlight">+3 mãos</span> com o blind atual – última chance para rebuys e add-ons.</li>
-                    <li>Após, ocorre o <span class="highlight">Chip Race</span> (troca de fichas menores) e intervalo para janta e contabilidade.</li>
-                    <li><span class="highlight-blue">Balanceamento de Mesas(Quando Houver):</span> O jogador mais próximo do big blind é transferido para manter o número equilibrado.</li>
-                    <li>Na nova mesa, ocupa posição equivalente ao big blind para não prejudicar o ciclo.</li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3><span class="icon">🗳️</span> Votações & Capilé (Gorjeta)</h3>
-                <ul>
-                    <li><span class="highlight">Votações:</span> Para dividir premiação ou qualquer decisão, a votação deve ser <span class="highlight-red">UNÂNIME</span>.</li>
-                    <li>Cada jogador recebe duas cartas: <span style="color:#e74c3c;font-weight:600;">🔴 VERMELHA = SIM</span> / <span style="color:#2c3e50;font-weight:600;">⚫ PRETA = NÃO</span>.</li>
-                    <li>Cartas abertas pelo dealer. Se todas forem da mesma cor, a decisão é aprovada.</li>
-                    <li>Nova votação só pode ser solicitada após a eliminação de um jogador.</li>
-                    <li><span class="highlight">💵 Capilé (Gorjeta):</span> Doação <span class="highlight">voluntária e natural</span>, sem imposição.</li>
-                    <li>A organização não se responsabiliza por acordos entre jogadores e dealers.</li>
-                    <li>Qualquer pagamento (PIX, espécie, etc.) é de responsabilidade exclusiva do jogador.</li>
-                </ul>
-            </div>
-
-            <div class="rules-section" style="border-color: rgba(204, 170, 0, 0.4); background: rgba(204, 170, 0, 0.05);">
-                <h3><span class="icon">📜</span> Disposições Finais</h3>
-                <ul>
-                    <li>✅ Ao se inscrever, você concorda automaticamente com todas as regras.</li>
-                    <li>✅ A organização pode alterar o regulamento a qualquer momento, visando o benefício do evento.</li>
-                    <li>✅ Durante o intervalo, <span class="highlight-red">não é permitido retirar fichas da mesa</span>.</li>
-                    <li>✅ O dealer é responsável por anotar rebuys, add-ons e gerenciar as fichas.</li>
-                    <li style="color:#f1c40f; font-weight:600;">🎯 O objetivo é celebrar a amizade, o fair play e o bom poker!</li>
-                </ul>
-            </div>
-
-            <div class="rules-final">
-                <p style="font-size: 13px; color: #ddd; line-height: 1.6;">
-                    <span style="font-size: 20px;">⚠️</span><br>
-                    Ao inserir o seu nome na lista para participar do <span class="final-highlight">Poker dos Amigos</span>, você declara ter lido e aceito <span class="final-highlight">todas as regras</span> estabelecidas contidas neste documento.<br><br>
-                    A compreensão e aceitação dessas diretrizes são fundamentais para garantir um ambiente de jogo justo e agradável para todos os participantes.
-                </p>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(204, 170, 0, 0.1); border-radius: 8px;">
-                    <p style="font-size: 12px; color: #aaa;">
-                        <i class="fas fa-check-circle" style="color: #2ecc71;"></i> Ao confirmar sua presença, você concorda automaticamente com as regras estabelecidas.
-                    </p>
-                </div>
-            </div>
-
-            <button class="btn btn-confirm" onclick="closeRulesModal()" style="margin-top: 20px;">✅ Li e Concordo</button>
-        </div>
+  <div class="confirm-form">
+    <div class="input-group"><input type="text" id="playerName" placeholder="👤 Digite seu nome" maxlength="30"></div>
+    <div class="input-group"><input type="tel" id="playerPhone" placeholder="📱 WhatsApp (DDD + número)" maxlength="15"></div>
+    <div class="input-group">
+      <select id="playerGroup"><option value="">Selecione sua turma...</option><option value="Poker New Soccer">Poker New Soccer</option><option value="Poker de Quinta">Poker de Quinta</option></select>
     </div>
-
-    <!-- MODAL MAPA DE ASSENTOS -->
-    <div class="modal" id="seatModal">
-        <div class="modal-content" style="max-width: 420px; width: 95%;">
-            <div style="font-size: 18px; font-weight: 700; color: #ccaa00; margin-bottom: 10px; font-family: 'Anton', sans-serif; letter-spacing: 1px;">
-                🪑 MAPA DE ASSENTOS
-            </div>
-            
-            <div class="seat-selector">
-                <select id="seatPlayerSelect" onchange="showPlayerSeat()">
-                    <option value="">Selecione um jogador...</option>
-                </select>
-            </div>
-
-            <div id="seatTicket">
-                <div class="no-seat-message">
-                    <i class="fas fa-chair"></i>
-                    Selecione um jogador para visualizar seu assento.
-                </div>
-            </div>
-
-            <button class="btn btn-modal-cancel" onclick="closeSeatModal()" style="margin-top: 15px;">Fechar</button>
-        </div>
+    <div class="input-group">
+      <label>🍽️ ENQUETE DA JANTA</label>
+      <div class="dinner-options">
+        <div class="dinner-option" data-dinner="Churrasco" onclick="selectDinner(this)"><div class="dinner-icon">🥩</div><div class="dinner-name">Churrasco</div></div>
+        <div class="dinner-option" data-dinner="Estrogonofe de Carne" onclick="selectDinner(this)"><div class="dinner-icon">🍲</div><div class="dinner-name">Estrogonofe de Carne</div></div>
+        <div class="dinner-option" data-dinner="Frango com Catupiry" onclick="selectDinner(this)"><div class="dinner-icon">🍗</div><div class="dinner-name">Frango com Catupiry</div></div>
+      </div>
+      <button type="button" class="cardapio-toggle" id="cardapioToggle" aria-expanded="false" aria-controls="cardapioBody" onclick="toggleCardapio()">
+        <span>🍽️ Ver opções de cardápio</span><i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="cardapio-body" id="cardapioBody"><div class="cardapio-inner">
+        <div class="menu-item"><h4>🥩 OPÇÃO 1 – CHURRASCO</h4><ul><li>Costela assada</li><li>Linguiçinha assada</li><li>Arroz branco</li><li>Farofa</li><li>Maionese</li><li>Salada de tomate e cebola</li></ul></div>
+        <div class="menu-item"><h4>🍲 OPÇÃO 2 – ESTROGONOFE DE CARNE</h4><ul><li>Estrogonofe de carne</li><li>Arroz branco</li><li>Batata palha</li></ul></div>
+        <div class="menu-item"><h4>🍗 OPÇÃO 3 – FRANGO COM CATUPIRY</h4><ul><li>Frango com catupiry</li><li>Arroz branco</li><li>Batata palha</li></ul></div>
+        <div class="menu-note">📌 Três opções deliciosas para você escolher!</div>
+      </div></div>
     </div>
+    <button class="btn btn-confirm" id="confirmBtn" onclick="confirmPresence()">✅ Confirmar Presença</button>
+    <button class="btn btn-cancel" onclick="showCancelModal()">❌ Cancelar Inscrição</button>
+  </div>
 
-    <script>
-        // CONFIGURAÇÃO DO FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyASHowL5Bf1WQlgaXvGjSPWRQxY-gjRWE8",
-            authDomain: "pokerdosamigos.firebaseapp.com",
-            databaseURL: "https://pokerdosamigos-default-rtdb.firebaseio.com",
-            projectId: "pokerdosamigos",
-            storageBucket: "pokerdosamigos.firebasestorage.app",
-            messagingSenderId: "588322228014",
-            appId: "1:588322228014:web:7c214d97eac03c0b835cbf"
-        };
+  <div class="confirmed-list">
+    <h3>👥 JOGADORES OFICIAIS</h3><div id="officialList"></div>
+    <h3 style="margin-top:16px;color:#ffb74d">⏳ LISTA DE ESPERA</h3><div id="waitingList"></div>
+  </div>
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const confirmadosRef = database.ref('confirmados');
-        const assentosRef = database.ref('assentos');
+  <button class="btn btn-rules" onclick="showRules()">📋 Regras do Evento</button>
 
-        const MAX_OFFICIAL = 40;
-        let selectedDinner = '';
-        let allPlayers = [];
-        let isAdmin = false;
-        let seatAssignments = {};
+  <div class="admin-section">
+    <div class="admin-toggle" onclick="toggleAdmin()">🔐 Área Admin</div>
+    <div class="admin-form" id="adminForm">
+      <div class="input-group"><input type="password" id="adminPassword" placeholder="Senha admin"></div>
+      <button class="btn btn-confirm" onclick="loginAdmin()" style="margin-top:0">Entrar</button>
+      <div id="adminControls" style="display:none">
+        <h4 style="color:var(--gold2);margin-bottom:10px">Gerenciar Jogadores:</h4>
+        <div class="admin-player-list" id="adminPlayerList"></div>
+        <h4 style="color:var(--gold2);margin:20px 0 10px">Gerenciar Assentos:</h4>
+        <div class="admin-seat-form">
+          <div class="input-group"><label>Turma</label>
+            <select id="adminSeatGroup" onchange="updateAdminSeatPlayers()"><option value="">Todas as Turmas</option><option value="Poker New Soccer">Poker New Soccer</option><option value="Poker de Quinta">Poker de Quinta</option></select></div>
+          <div class="input-group"><label>Jogador</label><select id="adminSeatPlayer"><option value="">Selecione um jogador</option></select></div>
+          <div class="input-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><label>Mesa</label><select id="adminSeatTable"><option>Mesa 1</option><option>Mesa 2</option><option>Mesa 3</option><option>Mesa 4</option><option>Mesa 5</option></select></div>
+            <div><label>Assento</label><input type="number" id="adminSeatNumber" min="1" max="10" placeholder="1-10"></div>
+          </div>
+          <button class="btn btn-modal-save btn-small" onclick="assignSeat()"><i class="fas fa-save"></i> Atribuir Assento</button>
+          <button class="btn btn-cancel btn-small" onclick="clearPlayerSeat()" style="margin-top:5px"><i class="fas fa-trash"></i> Remover Assento</button>
+        </div>
+        <h5 style="color:#aaa;font-size:12px;margin:15px 0 8px">Assentos Atuais:</h5>
+        <div id="adminSeatList"></div>
+      </div>
+    </div>
+  </div>
 
-        // FUNÇÕES AUXILIARES
-        function capitalizeName(name) {
-            return name
-                .toLowerCase()
-                .split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-        }
+  <div class="footer-xmas">🎅 Boas Festas! 🎁<small>Que o próximo ano traga saúde, paz e muitos bons encontros à mesa.</small></div>
+</div>
+</div>
 
-        function selectDinner(element) {
-            document.querySelectorAll('.dinner-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            selectedDinner = element.dataset.dinner;
-        }
+<div class="modal" id="modal"><div class="modal-content"><div class="modal-icon" id="modalIcon">✅</div><div class="modal-message" id="modalMessage"></div><button class="btn btn-confirm" style="margin:0" onclick="closeModal()">OK</button></div></div>
 
-        // ============ FUNÇÕES DE ASSENTOS ============
-        
-        // CARREGA OS ASSENTOS DO FIREBASE
-        function loadSeatAssignments() {
-            assentosRef.on('value', function(snapshot) {
-                const data = snapshot.val();
-                if (data) {
-                    seatAssignments = data;
-                    console.log('Assentos carregados:', JSON.stringify(seatAssignments));
-                } else {
-                    seatAssignments = {};
-                    console.log('Nenhum assento encontrado');
-                }
-                
-                // Atualiza todas as interfaces
-                updateAllInterfaces();
-            });
-        }
+<div class="modal" id="cancelModal"><div class="modal-content"><div class="modal-icon">❌</div>
+  <div class="modal-message">Digite seu nome para solicitar o cancelamento:</div>
+  <input type="text" id="cancelNameInput" class="modal-input" placeholder="Seu nome" maxlength="30">
+  <div class="modal-buttons"><button class="btn btn-modal-cancel" onclick="closeCancelModal()">Voltar</button><button class="btn btn-modal-confirm-cancel" onclick="confirmCancel()">Solicitar</button></div></div></div>
 
-        // ATUALIZA TODAS AS INTERFACES
-        function updateAllInterfaces() {
-            console.log('Atualizando todas as interfaces...');
-            console.log('Assentos atuais:', JSON.stringify(seatAssignments));
-            
-            // Atualiza o dropdown do mapa de assentos
-            updateSeatDropdown();
-            
-            // Atualiza a lista de assentos no admin
-            updateAdminSeatList();
-            
-            // Atualiza o dropdown de jogadores no admin
-            updateAdminSeatPlayers();
-            
-            // Atualiza os badges de assento na lista de jogadores
-            updatePlayerSeatBadges();
-            
-            // Se o modal de assentos estiver aberto, atualiza a visualização
-            const seatModal = document.getElementById('seatModal');
-            if (seatModal.classList.contains('active')) {
-                const select = document.getElementById('seatPlayerSelect');
-                if (select.value) {
-                    showPlayerSeat();
-                }
-            }
-        }
+<div class="modal" id="rulesModal"><div class="modal-content rules-modal-content">
+  <h2>♠️ REGULAMENTO POKER DOS AMIGOS ♥️</h2>
+  <div class="rules-welcome">📅 17 de Dezembro • 19h • Quintal do Almirante<br>🎄 Um encontro amistoso para celebrar a amizade dos amantes do poker e fechar o ano em grande estilo!</div>
+  <div class="rules-section"><h3>🧑‍⚖️ Organização & Dealers</h3><ul>
+    <li><span class="hl">Dealers profissionais:</span> serão contratados para distribuir as cartas, controlar a mesa e garantir jogo justo e transparente.</li>
+    <li><span class="hl">Autoridade máxima:</span> os dealers têm autoridade máxima na mesa (troca de fichas, troco, blinds e antes).</li>
+    <li><span class="hr">Respeito obrigatório:</span> qualquer ato de desrespeito resultará em exclusão imediata do jogador.</li>
+    <li><span class="hl">Dealers voluntários:</span> em caso de atraso, a organização pode autorizar voluntários (sem remuneração) até a chegada do dealer oficial.</li>
+    <li><span class="hl">Método tradicional:</span> na ausência de dealers, cada jogador dá as cartas uma vez por rodada (sentido horário).</li>
+    <li><span class="hb">Troca de dealers:</span> se quiserem, a cada 1 hora, os dealers trocam de mesa com intervalo de 5 minutos.</li></ul></div>
+  <div class="rules-section"><h3>💰 Valores e Buy-In</h3><ul>
+    <li><span class="hl">🎟️ Buy-In + Janta + Taxa:</span> R$ 100,00 = 15.000 fichas <small style="color:#999">(R$ 30,00 janta • R$ 20,00 taxa • R$ 50,00 pote)</small></li>
+    <li><span class="ho">🔄 Rebuys (ilimitados até o 10º nível):</span> R$ 25,00 = 15.000 fichas <span class="hr">*Somente quando zerado em fichas*</span></li>
+    <li><span class="ho">🔄 Rebuy DUPLO:</span> R$ 50,00 = 30.000 fichas <span class="hr">*Somente quando zerado em fichas*</span></li>
+    <li><span class="hb">➕ Add-on (1 por jogador):</span> R$ 50,00 = 50.000 fichas <span class="hb">*Disponível apenas no fim do 10º nível*</span></li>
+    <li><span class="hg">⏰ Bônus de chegada:</span> quem chegar <u>antes das 19h</u> ganha <span class="hl">+2.000 fichas</span> (apresente o ticket ao dealer).</li>
+    <li>🍽️ A janta será preparada pelo Bruxo da Cozinha! O valor já está incluso no buy-in. Quem optar por não comer, paga o mesmo valor.</li></ul></div>
+  <div class="rules-section"><h3>♣️ O Jogo & Dinâmica da Mesa</h3><ul>
+    <li><span class="hl">Balanceamento:</span> mesas equilibradas com integrantes de cada turma.</li>
+    <li><span class="hl">Cartas visíveis:</span> mantenha as cartas sobre a mesa, à frente da pilha de fichas.</li>
+    <li><span class="hr">Tempo de decisão:</span> 30 segundos – se não agir, é <span class="hr">FOLD</span>.</li>
+    <li><span class="hl">Fichas:</span> sempre sobre a mesa, com as de maior valor na frente.</li>
+    <li><span class="hl">Mostrou para um, mostrou para todos:</span> se mostrar sua carta a alguém, deve mostrar a todos.</li>
+    <li><span class="hr">Ausência na distribuição:</span> se não estiver na mesa quando a 2ª carta for distribuída, a mão é descartada.</li>
+    <li><span class="hl">Sit-out:</span> jogadores ausentes pagam blinds normalmente e o dealer gerencia suas fichas.</li>
+    <li><span class="hl">Aposta em movimento único:</span> apostas em múltiplos movimentos sem declaração verbal serão desconsideradas.</li></ul></div>
+  <div class="rules-section"><h3>⏳ Blinds & Balanceamento</h3><ul>
+    <li><span class="hl">Aumento dos blinds:</span> 13 minutos por nível (início) → 10 min → 8 min (após intervalo).</li>
+    <li>Alerta sonoro indica o novo nível.</li>
+    <li>Ao final do 10º nível: jogam-se <span class="hl">+3 mãos</span> com o blind atual – última chance para rebuys e add-ons.</li>
+    <li>Após, ocorre o <span class="hl">Chip Race</span> e intervalo para janta e contabilidade.</li>
+    <li><span class="hb">Balanceamento de mesas (quando houver):</span> o jogador mais próximo do big blind é transferido.</li>
+    <li>Na nova mesa, ocupa posição equivalente ao big blind para não prejudicar o ciclo.</li></ul></div>
+  <div class="rules-section"><h3>🗳️ Votações & Capilé (Gorjeta)</h3><ul>
+    <li><span class="hl">Votações:</span> para dividir premiação ou qualquer decisão, a votação deve ser <span class="hr">UNÂNIME</span>.</li>
+    <li>Cada jogador recebe duas cartas: <span class="hr">🔴 VERMELHA = SIM</span> / ⚫ <b>PRETA = NÃO</b>.</li>
+    <li>Cartas abertas pelo dealer. Se todas forem da mesma cor, a decisão é aprovada.</li>
+    <li>Nova votação só pode ser solicitada após a eliminação de um jogador.</li>
+    <li><span class="hl">💵 Capilé (Gorjeta):</span> doação <span class="hl">voluntária e natural</span>, sem imposição.</li>
+    <li>A organização não se responsabiliza por acordos entre jogadores e dealers.</li>
+    <li>Qualquer pagamento (PIX, espécie, etc.) é de responsabilidade exclusiva do jogador.</li></ul></div>
+  <div class="rules-section"><h3>📜 Disposições Finais</h3><ul>
+    <li>✅ Ao se inscrever, você concorda automaticamente com todas as regras.</li>
+    <li>✅ A organização pode alterar o regulamento a qualquer momento, visando o benefício do evento.</li>
+    <li>✅ Durante o intervalo, <span class="hr">não é permitido retirar fichas da mesa</span>.</li>
+    <li>✅ O dealer é responsável por anotar rebuys, add-ons e gerenciar as fichas.</li>
+    <li class="hl">🎯 O objetivo é celebrar a amizade, o fair play e o bom poker!</li></ul></div>
+  <div class="rules-final">⚠️ Ao inserir o seu nome na lista do <span class="hl">Poker dos Amigos</span>, você declara ter lido e aceito <span class="hl">todas as regras</span> deste documento.</div>
+  <button class="btn btn-confirm" onclick="closeRulesModal()">✅ Li e Concordo</button>
+</div></div>
 
-        // ATUALIZA O DROPDOWN DO MAPA DE ASSENTOS
-        function updateSeatDropdown() {
-            const select = document.getElementById('seatPlayerSelect');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Selecione um jogador...</option>';
-            
-            // Pega apenas jogadores oficiais (não waiting)
-            const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
-            officialPlayers.sort((a, b) => a.name.localeCompare(b.name));
-            
-            if (officialPlayers.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Nenhum jogador oficial';
-                option.disabled = true;
-                select.appendChild(option);
-            } else {
-                // Agrupa por turma
-                const grouped = {};
-                officialPlayers.forEach(p => {
-                    if (!grouped[p.group]) grouped[p.group] = [];
-                    grouped[p.group].push(p);
-                });
+<div class="modal" id="seatModal"><div class="modal-content" style="max-width:420px;width:95%">
+  <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold2);margin-bottom:12px">🪑 MAPA DE ASSENTOS</div>
+  <div class="seat-selector"><select id="seatPlayerSelect" onchange="showPlayerSeat()"><option value="">Selecione um jogador...</option></select></div>
+  <div id="seatTicket"></div>
+  <button class="btn btn-modal-cancel" onclick="closeSeatModal()" style="margin-top:15px">Fechar</button>
+</div></div>
 
-                for (const [group, players] of Object.entries(grouped)) {
-                    const optgroup = document.createElement('optgroup');
-                    optgroup.label = group;
-                    players.forEach(player => {
-                        const option = document.createElement('option');
-                        option.value = player.name;
-                        option.textContent = player.name;
-                        optgroup.appendChild(option);
-                    });
-                    select.appendChild(optgroup);
-                }
-            }
-            
-            // Restaura seleção anterior se existir
-            if (currentValue) {
-                const options = select.querySelectorAll('option');
-                options.forEach(opt => {
-                    if (opt.value === currentValue) {
-                        opt.selected = true;
-                    }
-                });
-                showPlayerSeat();
-            }
-        }
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyASHowL5Bf1WQlgaXvGjSPWRQxY-gjRWE8",
+  authDomain: "pokerdosamigos.firebaseapp.com",
+  databaseURL: "https://pokerdosamigos-default-rtdb.firebaseio.com",
+  projectId: "pokerdosamigos",
+  storageBucket: "pokerdosamigos.firebasestorage.app",
+  messagingSenderId: "588322228014",
+  appId: "1:588322228014:web:7c214d97eac03c0b835cbf"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+const confirmadosRef = database.ref('confirmados');
+const assentosRef = database.ref('assentos');
+const MAX_OFFICIAL = 40;
+let selectedDinner = '', allPlayers = [], isAdmin = false, seatAssignments = {};
 
-        // MOSTRA O TICKET DO ASSENTO
-        function showPlayerSeat() {
-            const select = document.getElementById('seatPlayerSelect');
-            const playerName = select.value;
-            const ticketDiv = document.getElementById('seatTicket');
+// Cardápio (ícones e nomes) + compatibilidade com votos antigos
+const DINNERS = {
+  'Churrasco': '🥩',
+  'Estrogonofe de Carne': '🍲',
+  'Frango com Catupiry': '🍗'
+};
+const LEGACY_DINNER = { 'Bife a Role': 'Churrasco', 'Vaca Atolada': 'Estrogonofe de Carne', 'Rabada com Polenta': 'Frango com Catupiry' };
 
-            console.log('Buscando assento para:', playerName);
-            console.log('Assentos disponíveis:', JSON.stringify(seatAssignments));
+// neve discreta
+(function(){
+  const s = document.getElementById('snow');
+  for (let i = 0; i < 26; i++) {
+    const f = document.createElement('i');
+    f.style.left = Math.random() * 100 + '%';
+    f.style.animationDuration = (9 + Math.random() * 12) + 's';
+    f.style.animationDelay = (-Math.random() * 20) + 's';
+    f.style.transform = 'scale(' + (0.6 + Math.random() * 1.2) + ')';
+    s.appendChild(f);
+  }
+})();
 
-            if (!playerName) {
-                ticketDiv.innerHTML = `
-                    <div class="no-seat-message">
-                        <i class="fas fa-chair"></i>
-                        Selecione um jogador para visualizar seu assento.
-                    </div>
-                `;
-                return;
-            }
+function toggleCardapio() {
+  const body = document.getElementById('cardapioBody');
+  const btn = document.getElementById('cardapioToggle');
+  const open = body.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open);
+  btn.querySelector('span').textContent = open ? '🍽️ Recolher cardápio' : '🍽️ Ver opções de cardápio';
+}
 
-            let found = false;
-            let mesa = '';
-            let assento = 0;
+function capitalizeName(n) { return n.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+function selectDinner(el) {
+  document.querySelectorAll('.dinner-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDinner = el.dataset.dinner;
+}
+function normDinner(d) { return LEGACY_DINNER[d] || d; }
 
-            // Percorre todas as mesas e assentos
-            for (const [mesaNome, jogadores] of Object.entries(seatAssignments)) {
-                if (jogadores && Array.isArray(jogadores)) {
-                    const index = jogadores.indexOf(playerName);
-                    if (index !== -1) {
-                        mesa = mesaNome;
-                        assento = index + 1;
-                        found = true;
-                        console.log('ENCONTRADO!', playerName, 'na', mesa, 'assento', assento);
-                        break;
-                    }
-                }
-            }
+// ============ ASSENTOS ============
+function findSeat(name) {
+  for (const [mesa, js] of Object.entries(seatAssignments)) {
+    if (js && Array.isArray(js)) {
+      const i = js.indexOf(name);
+      if (i !== -1) return { mesa, idx: i };
+    }
+  }
+  return null;
+}
+function copySeats() {
+  const c = {};
+  for (const [m, js] of Object.entries(seatAssignments)) c[m] = [...js];
+  return c;
+}
+function saveSeats(seats, okMsg) {
+  assentosRef.set(seats).then(() => showModal('✅', okMsg)).catch(e => showModal('❌', 'Erro ao salvar assento: ' + e.message));
+}
+function loadSeatAssignments() {
+  assentosRef.on('value', snap => {
+    seatAssignments = snap.val() || {};
+    updateAllInterfaces();
+  });
+}
+function updateAllInterfaces() {
+  updateSeatDropdown();
+  updateAdminSeatList();
+  updateAdminSeatPlayers();
+  updatePlayerSeatBadges();
+  if (document.getElementById('seatModal').classList.contains('active') && document.getElementById('seatPlayerSelect').value) showPlayerSeat();
+}
+function updateSeatDropdown() {
+  const select = document.getElementById('seatPlayerSelect');
+  const cur = select.value;
+  select.innerHTML = '<option value="">Selecione um jogador...</option>';
+  const official = allPlayers.filter(p => p.status !== 'waiting').sort((a, b) => a.name.localeCompare(b.name));
+  if (!official.length) {
+    select.insertAdjacentHTML('beforeend', '<option value="" disabled>Nenhum jogador oficial</option>');
+    return;
+  }
+  const grouped = {};
+  official.forEach(p => (grouped[p.group] = grouped[p.group] || []).push(p));
+  for (const [group, players] of Object.entries(grouped)) {
+    const og = document.createElement('optgroup');
+    og.label = group;
+    players.forEach(p => {
+      const o = document.createElement('option');
+      o.value = o.textContent = p.name;
+      og.appendChild(o);
+    });
+    select.appendChild(og);
+  }
+  if (cur) { select.value = cur; showPlayerSeat(); }
+}
+function showPlayerSeat() {
+  const name = document.getElementById('seatPlayerSelect').value;
+  const div = document.getElementById('seatTicket');
+  if (!name) {
+    div.innerHTML = '<div class="no-seat-message"><i class="fas fa-chair"></i>Selecione um jogador para visualizar seu assento.</div>';
+    return;
+  }
+  const s = findSeat(name);
+  if (s) {
+    div.innerHTML = `<div class="ticket-container">
+      <img src="icon-512x512.png" alt="Poker dos Amigos" class="ticket-image" onerror="this.style.display='none'">
+      <div class="ticket-header"><div class="ticket-title">♠️ POKER DOS AMIGOS</div><div class="ticket-subtitle">🎫 Ticket de Assento • Encerramento do Ano</div></div>
+      <div class="ticket-player-name">${name}</div>
+      <div class="ticket-body">
+        <div class="ticket-item"><div class="label">🪑 MESA</div><div class="value">${s.mesa}</div></div>
+        <div class="ticket-item"><div class="label">📍 ASSENTO</div><div class="value">${s.idx + 1}</div></div>
+      </div>
+      <div class="ticket-footer"><i class="fas fa-check-circle"></i> Confirme sua presença no local</div>
+      <div class="ticket-info">📅 17 de Dezembro • 19:00 • Quintal do Almirante</div></div>`;
+  } else {
+    div.innerHTML = `<div class="no-seat-message"><i class="fas fa-question-circle"></i><strong style="color:#9b1b30">${name}</strong><br>Este jogador ainda não possui um assento atribuído.<br><span style="font-size:12px;color:#999">Fale com o administrador para definir sua mesa.</span></div>`;
+  }
+}
+function openSeatModal() {
+  updateSeatDropdown();
+  showPlayerSeat();
+  document.getElementById('seatModal').classList.add('active');
+}
+function closeSeatModal() { document.getElementById('seatModal').classList.remove('active'); }
 
-            if (found) {
-                ticketDiv.innerHTML = `
-                    <div class="ticket-container">
-                        <img src="icon-512x512.png" alt="Poker dos Amigos" class="ticket-image" onerror="this.style.display='none'">
-                        <div class="ticket-header">
-                            <div class="ticket-title">♠️ POKER DOS AMIGOS</div>
-                            <div class="ticket-subtitle">🎫 Ticket de Assento</div>
-                        </div>
-                        <div class="ticket-player-name">${playerName}</div>
-                        <div class="ticket-body">
-                            <div class="ticket-item">
-                                <div class="label">🪑 Mesa</div>
-                                <div class="value gold">${mesa}</div>
-                            </div>
-                            <div class="ticket-item">
-                                <div class="label">📍 Assento</div>
-                                <div class="value gold">${assento}</div>
-                            </div>
-                        </div>
-                        <div class="ticket-footer">
-                            <i class="fas fa-check-circle"></i> Confirme sua presença no local
-                        </div>
-                        <div class="ticket-info">
-                            📅 10 de Setembro • 19:00 • New Soccer
-                        </div>
-                    </div>
-                `;
-            } else {
-                ticketDiv.innerHTML = `
-                    <div class="no-seat-message">
-                        <i class="fas fa-question-circle"></i>
-                        <strong style="color: #b8860b;">${playerName}</strong><br>
-                        Este jogador ainda não possui um assento atribuído.<br>
-                        <span style="font-size: 12px; color: #999;">Fale com o administrador para definir sua mesa.</span>
-                    </div>
-                `;
-            }
-        }
+// ============ ADMIN: ASSENTOS ============
+function updateAdminSeatPlayers() {
+  const g = document.getElementById('adminSeatGroup').value;
+  const sel = document.getElementById('adminSeatPlayer');
+  sel.innerHTML = '<option value="">Selecione um jogador</option>';
+  let list = allPlayers.filter(p => p.status !== 'waiting');
+  if (g) list = list.filter(p => p.group === g);
+  list.sort((a, b) => a.name.localeCompare(b.name));
+  if (!list.length) { sel.insertAdjacentHTML('beforeend', '<option value="" disabled>Nenhum jogador disponível</option>'); return; }
+  list.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.name;
+    o.textContent = `${p.name} (${p.group})`;
+    sel.appendChild(o);
+  });
+}
+function updateAdminSeatList() {
+  const div = document.getElementById('adminSeatList');
+  div.innerHTML = '';
+  if (!isAdmin) { div.innerHTML = '<p style="color:#666;font-size:12px;text-align:center">Faça login como admin para gerenciar assentos.</p>'; return; }
+  let any = false;
+  for (const [mesa, js] of Object.entries(seatAssignments)) {
+    if (!Array.isArray(js)) continue;
+    js.forEach((j, i) => {
+      if (!j) return;
+      any = true;
+      const item = document.createElement('div');
+      item.className = 'seat-assignment-item';
+      item.innerHTML = `<span>${j}</span><span class="seat-info">${mesa} - Assento ${i + 1}</span><button class="btn-remove-seat" onclick="removeSeat('${mesa}','${j.replace(/'/g, "\\'")}')">✕</button>`;
+      div.appendChild(item);
+    });
+  }
+  if (!any) div.innerHTML = '<p style="color:#666;font-size:12px;text-align:center">Nenhum assento atribuído ainda.</p>';
+}
+function updatePlayerSeatBadges() {
+  updatePlayerLists(allPlayers.filter(p => p.status !== 'waiting'), allPlayers.filter(p => p.status === 'waiting'));
+}
+function assignSeat() {
+  if (!isAdmin) return showModal('❌', 'Você precisa estar logado como admin.');
+  const name = document.getElementById('adminSeatPlayer').value;
+  const table = document.getElementById('adminSeatTable').value;
+  const n = parseInt(document.getElementById('adminSeatNumber').value);
+  if (!name) return showModal('❌', 'Selecione um jogador.');
+  if (!n || n < 1 || n > 10) return showModal('❌', 'Digite um número de assento válido (1-10).');
+  const ex = findSeat(name);
+  if (ex) return showModal('❌', `${name} já possui um assento na ${ex.mesa}. Remova o assento atual primeiro.`);
+  if (seatAssignments[table] && seatAssignments[table][n - 1]) return showModal('❌', `Assento ${n} da ${table} já está ocupado por ${seatAssignments[table][n - 1]}.`);
+  const seats = copySeats();
+  seats[table] = seats[table] || [];
+  while (seats[table].length < n) seats[table].push(null);
+  seats[table][n - 1] = name;
+  document.getElementById('adminSeatNumber').value = '';
+  saveSeats(seats, `${name} atribuído à ${table}, Assento ${n}!`);
+}
+function dropSeat(seats, mesa, idx) {
+  seats[mesa][idx] = null;
+  seats[mesa] = seats[mesa].filter(p => p);
+  if (!seats[mesa].length) delete seats[mesa];
+}
+function clearPlayerSeat() {
+  if (!isAdmin) return showModal('❌', 'Você precisa estar logado como admin.');
+  const name = document.getElementById('adminSeatPlayer').value;
+  if (!name) return showModal('❌', 'Selecione um jogador.');
+  const s = findSeat(name);
+  if (!s) return showModal('❌', `${name} não possui um assento atribuído.`);
+  const seats = copySeats();
+  dropSeat(seats, s.mesa, s.idx);
+  saveSeats(seats, `Assento de ${name} removido com sucesso!`);
+}
+function removeSeat(mesa, jogador) {
+  if (!isAdmin || !confirm(`Remover ${jogador} da ${mesa}?`)) return;
+  const seats = copySeats();
+  const i = seats[mesa] ? seats[mesa].indexOf(jogador) : -1;
+  if (i === -1) return;
+  dropSeat(seats, mesa, i);
+  saveSeats(seats, `${jogador} removido da ${mesa}.`);
+}
 
-        // ABRE O MODAL DE ASSENTOS
-        function openSeatModal() {
-            console.log('Abrindo modal de assentos...');
-            // Atualiza o dropdown antes de abrir
-            updateSeatDropdown();
-            
-            document.getElementById('seatTicket').innerHTML = `
-                <div class="no-seat-message">
-                    <i class="fas fa-chair"></i>
-                    Selecione um jogador para visualizar seu assento.
-                </div>
-            `;
-            document.getElementById('seatModal').classList.add('active');
-            
-            const select = document.getElementById('seatPlayerSelect');
-            if (select.value) {
-                showPlayerSeat();
-            }
-        }
+// ============ JOGADORES ============
+function loadConfirmedPlayers() {
+  confirmadosRef.on('value', snap => {
+    const data = snap.val() || {};
+    const players = Object.keys(data).map(k => ({ id: k, ...data[k] })).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    const official = players.filter(p => p.status !== 'waiting');
+    const waiting = players.filter(p => p.status === 'waiting');
+    allPlayers = [...official, ...waiting];
 
-        // FECHA O MODAL DE ASSENTOS
-        function closeSeatModal() {
-            document.getElementById('seatModal').classList.remove('active');
-        }
+    document.getElementById('confirmedCount').textContent = official.length;
+    document.getElementById('countNewSoccer').textContent = official.filter(p => p.group === 'Poker New Soccer').length;
+    document.getElementById('countQuinta').textContent = official.filter(p => p.group === 'Poker de Quinta').length;
 
-        // ============ FUNÇÕES ADMIN ============
+    const votes = {};
+    official.forEach(p => { const d = normDinner(p.dinner); if (DINNERS[d]) votes[d] = (votes[d] || 0) + 1; });
+    let best = null, max = 0;
+    for (const d in votes) if (votes[d] > max) { max = votes[d]; best = d; }
+    document.getElementById('mostVotedDinner').textContent = best ? `${DINNERS[best]} ${best}` : '-';
+    document.getElementById('mostVotedVotes').textContent = best ? `${max} voto${max > 1 ? 's' : ''}` : '';
 
-        // ATUALIZA O DROPDOWN DE JOGADORES NO ADMIN
-        function updateAdminSeatPlayers() {
-            const groupSelect = document.getElementById('adminSeatGroup');
-            const playerSelect = document.getElementById('adminSeatPlayer');
-            const selectedGroup = groupSelect.value;
-            
-            playerSelect.innerHTML = '<option value="">Selecione um jogador</option>';
-            
-            // Pega apenas jogadores oficiais (não waiting)
-            const officialPlayers = allPlayers.filter(p => p.status !== 'waiting');
-            let filtered = officialPlayers;
-            
-            if (selectedGroup) {
-                filtered = officialPlayers.filter(p => p.group === selectedGroup);
-            }
-            
-            filtered.sort((a, b) => a.name.localeCompare(b.name));
-            
-            if (filtered.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Nenhum jogador disponível';
-                option.disabled = true;
-                playerSelect.appendChild(option);
-            } else {
-                filtered.forEach(player => {
-                    const option = document.createElement('option');
-                    option.value = player.name;
-                    option.textContent = `${player.name} (${player.group})`;
-                    playerSelect.appendChild(option);
-                });
-            }
-        }
+    const btn = document.getElementById('confirmBtn');
+    const full = official.length >= MAX_OFFICIAL;
+    btn.textContent = full ? '⏳ Lista Cheia - Entrar na Espera' : '✅ Confirmar Presença';
+    updatePlayerLists(official, waiting);
+    updateAdminPlayerList();
+    updateAllInterfaces();
+  });
+}
+function updatePlayerLists(official, waiting) {
+  const o = document.getElementById('officialList'), w = document.getElementById('waitingList');
+  o.innerHTML = w.innerHTML = '';
+  official.forEach((p, i) => o.appendChild(createPlayerItem(p, i + 1, false)));
+  waiting.forEach((p, i) => w.appendChild(createPlayerItem(p, i + 1, true)));
+}
+function createPlayerItem(p, index, isWaiting) {
+  const el = document.createElement('div');
+  el.className = 'player-item' + (isWaiting ? ' waiting-list' : '');
+  const group = `<span class="badge ${p.group === 'Poker New Soccer' ? 'badge-turma-new' : 'badge-turma-quinta'}">${p.group}</span>`;
+  const d = normDinner(p.dinner);
+  const dinner = d ? `<span class="badge badge-janta">${DINNERS[d] || '🍽️'} ${d}</span>` : '';
+  const status = isWaiting ? '<span class="badge badge-waiting">⏳ Espera</span>' : '<span class="badge" style="background:rgba(76,175,80,.2);color:#81c784;border:1px solid #81c784">✅ Oficial</span>';
+  const s = findSeat(p.name);
+  const seat = s ? `<span class="badge" style="background:rgba(33,150,243,.2);color:#64b5f6;border:1px solid #64b5f6">🪑 ${s.mesa} - Assento ${s.idx + 1}</span>` : '';
+  el.innerHTML = `<div class="player-info"><div style="display:flex;align-items:center"><span class="player-number">${index}</span><span class="player-name">🃏 ${p.name}</span></div>
+    ${p.phone ? `<span style="color:#25D366;font-size:12px"><i class="fab fa-whatsapp"></i> ${p.phone}</span>` : ''}</div>
+    <div class="badge-container">${group}${dinner}${status}${seat}</div>`;
+  return el;
+}
+function updateAdminPlayerList() {
+  const list = document.getElementById('adminPlayerList');
+  list.innerHTML = '';
+  if (!isAdmin) return;
+  allPlayers.forEach(p => {
+    const w = p.status === 'waiting';
+    const item = document.createElement('div');
+    item.className = 'admin-player-item ' + (w ? 'waiting' : 'official');
+    const s = findSeat(p.name);
+    item.innerHTML = `<span style="font-size:13px">${p.name} (${p.group}) ${w ? '⏳' : '✅'}${s ? ` 🪑 ${s.mesa} A${s.idx + 1}` : ''}</span>`;
+    const actions = document.createElement('div');
+    actions.className = 'admin-actions';
+    if (w) {
+      const pb = document.createElement('button');
+      pb.className = 'btn-promote';
+      pb.textContent = '⬆ Promover';
+      pb.onclick = () => promotePlayer(p.id);
+      actions.appendChild(pb);
+    }
+    const rb = document.createElement('button');
+    rb.className = 'btn-remove-player';
+    rb.innerHTML = '<i class="fas fa-times"></i>';
+    rb.onclick = () => removePlayerById(p.id);
+    actions.appendChild(rb);
+    item.appendChild(actions);
+    list.appendChild(item);
+  });
+}
+function promotePlayer(id) {
+  if (!isAdmin) return;
+  if (allPlayers.filter(p => p.status !== 'waiting').length >= MAX_OFFICIAL) return showModal('❌', 'Lista oficial já está cheia (40 jogadores)!');
+  confirmadosRef.child(id).update({ status: null }).then(() => showModal('✅', 'Jogador promovido para a lista oficial!')).catch(() => showModal('❌', 'Erro ao promover jogador.'));
+}
+function removePlayerById(id) {
+  if (!isAdmin || !confirm('Tem certeza que deseja remover este jogador?')) return;
+  confirmadosRef.child(id).remove().then(() => showModal('✅', 'Jogador removido com sucesso!')).catch(() => showModal('❌', 'Erro ao remover jogador.'));
+}
 
-        // ATUALIZA A LISTA DE ASSENTOS NO ADMIN
-        function updateAdminSeatList() {
-            const listDiv = document.getElementById('adminSeatList');
-            listDiv.innerHTML = '';
-            
-            if (!isAdmin) {
-                listDiv.innerHTML = '<p style="color: #666; font-size: 12px; text-align: center;">Faça login como admin para gerenciar assentos.</p>';
-                return;
-            }
-            
-            let hasSeats = false;
-            
-            // Percorre todas as mesas e assentos
-            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                if (jogadores && Array.isArray(jogadores) && jogadores.length > 0) {
-                    jogadores.forEach((jogador, index) => {
-                        if (jogador && jogador !== null && jogador !== '') {
-                            hasSeats = true;
-                            const item = document.createElement('div');
-                            item.className = 'seat-assignment-item';
-                            item.innerHTML = `
-                                <span>${jogador}</span>
-                                <span class="seat-info">${mesa} - Assento ${index + 1}</span>
-                                <button class="btn-remove-seat" onclick="removeSeat('${mesa}', '${jogador}')">✕</button>
-                            `;
-                            listDiv.appendChild(item);
-                        }
-                    });
-                }
-            }
-            
-            if (!hasSeats) {
-                listDiv.innerHTML = '<p style="color: #666; font-size: 12px; text-align: center;">Nenhum assento atribuído ainda.</p>';
-            }
-        }
+// ============ FORMULÁRIO ============
+function formatPhone(v) {
+  const n = v.replace(/\D/g, '').slice(0, 11);
+  if (n.length <= 2) return n;
+  if (n.length <= 6) return `(${n.slice(0, 2)}) ${n.slice(2)}`;
+  if (n.length <= 10) return `(${n.slice(0, 2)}) ${n.slice(2, 6)}-${n.slice(6)}`;
+  return `(${n.slice(0, 2)}) ${n.slice(2, 7)}-${n.slice(7)}`;
+}
+document.getElementById('playerPhone').addEventListener('input', function () { this.value = formatPhone(this.value); });
 
-        // ATUALIZA OS BADGES DE ASSENTO NA LISTA DE JOGADORES
-        function updatePlayerSeatBadges() {
-            // Recria a lista de jogadores com os badges atualizados
-            const official = allPlayers.filter(p => p.status !== 'waiting');
-            const waiting = allPlayers.filter(p => p.status === 'waiting');
-            updatePlayerLists(official, waiting);
-        }
+function confirmPresence() {
+  const name = capitalizeName(document.getElementById('playerName').value.trim());
+  const phone = document.getElementById('playerPhone').value.trim();
+  const group = document.getElementById('playerGroup').value;
+  if (!name) return showModal('❌', 'Por favor, digite seu nome!');
+  if (!phone) return showModal('❌', 'Por favor, digite seu WhatsApp!');
+  if (!group) return showModal('❌', 'Por favor, selecione sua turma!');
+  if (!selectedDinner) return showModal('❌', 'Por favor, escolha sua opção de janta!');
+  if (allPlayers.some(p => p.name === name)) return showModal('❌', 'Este nome já está inscrito!');
+  const isWaiting = allPlayers.filter(p => p.status !== 'waiting').length >= MAX_OFFICIAL;
+  const data = { name, phone, group, dinner: selectedDinner, timestamp: Date.now() };
+  if (isWaiting) data.status = 'waiting';
+  confirmadosRef.push().set(data).then(() => {
+    ['playerName', 'playerPhone', 'playerGroup'].forEach(id => document.getElementById(id).value = '');
+    document.querySelectorAll('.dinner-option').forEach(o => o.classList.remove('selected'));
+    selectedDinner = '';
+    showModal(isWaiting ? '⏳' : '🎄', isWaiting ? `${name}, você foi colocado na lista de espera!` : `${name}, sua presença foi confirmada! Até lá!`);
+  }).catch(() => showModal('❌', 'Erro ao confirmar. Tente novamente.'));
+}
 
-        // ATRIBUI UM ASSENTO A UM JOGADOR
-        function assignSeat() {
-            if (!isAdmin) {
-                showModal('❌', 'Você precisa estar logado como admin.');
-                return;
-            }
-            
-            const playerName = document.getElementById('adminSeatPlayer').value;
-            const table = document.getElementById('adminSeatTable').value;
-            const seatNumber = parseInt(document.getElementById('adminSeatNumber').value);
-            
-            if (!playerName) {
-                showModal('❌', 'Selecione um jogador.');
-                return;
-            }
-            
-            if (!seatNumber || seatNumber < 1 || seatNumber > 10) {
-                showModal('❌', 'Digite um número de assento válido (1-10).');
-                return;
-            }
-            
-            // Verifica se o jogador já tem um assento
-            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                if (jogadores && Array.isArray(jogadores) && jogadores.includes(playerName)) {
-                    showModal('❌', `${playerName} já possui um assento na ${mesa}. Remova o assento atual primeiro.`);
-                    return;
-                }
-            }
-            
-            // Verifica se o assento está ocupado
-            if (seatAssignments[table] && seatAssignments[table][seatNumber - 1]) {
-                showModal('❌', `Assento ${seatNumber} da ${table} já está ocupado por ${seatAssignments[table][seatNumber - 1]}.`);
-                return;
-            }
-            
-            // Cria uma cópia dos assentos
-            const updatedSeats = {};
-            
-            // Copia os assentos existentes
-            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                updatedSeats[mesa] = [...jogadores];
-            }
-            
-            if (!updatedSeats[table]) {
-                updatedSeats[table] = [];
-            }
-            
-            // Preenche com null até o índice desejado
-            while (updatedSeats[table].length < seatNumber) {
-                updatedSeats[table].push(null);
-            }
-            
-            updatedSeats[table][seatNumber - 1] = playerName;
-            
-            console.log('Salvando assentos:', JSON.stringify(updatedSeats));
-            
-            // Salva no Firebase
-            assentosRef.set(updatedSeats)
-                .then(() => {
-                    showModal('✅', `${playerName} atribuído à ${table}, Assento ${seatNumber}!`);
-                    document.getElementById('adminSeatNumber').value = '';
-                    // O snapshot do Firebase vai atualizar automaticamente
-                })
-                .catch((error) => {
-                    console.error('Erro ao salvar:', error);
-                    showModal('❌', 'Erro ao atribuir assento: ' + error.message);
-                });
-        }
+// ============ CANCELAMENTO ============
+function showCancelModal() { document.getElementById('cancelNameInput').value = ''; document.getElementById('cancelModal').classList.add('active'); }
+function closeCancelModal() { document.getElementById('cancelModal').classList.remove('active'); }
+function confirmCancel() {
+  const name = capitalizeName(document.getElementById('cancelNameInput').value.trim());
+  if (!name) { closeCancelModal(); return showModal('❌', 'Digite seu nome para cancelar!'); }
+  const p = allPlayers.find(x => x.name === name);
+  if (!p) { closeCancelModal(); return showModal('❌', 'Nome não encontrado na lista.'); }
+  const num = p.group === 'Poker New Soccer' ? '5541998046898' : '5541987210685';
+  const msg = `Olá! Gostaria de CANCELAR minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${p.name}%0A*WhatsApp:* ${p.phone || 'Não informado'}%0A*Turma:* ${p.group}%0A%0A*Por favor, remova meu nome da lista.*`;
+  window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+  closeCancelModal();
+  showModal('📱', 'Solicitação de cancelamento enviada pelo WhatsApp! O admin irá remover sua inscrição.');
+}
 
-        // REMOVE O ASSENTO DE UM JOGADOR
-        function clearPlayerSeat() {
-            if (!isAdmin) {
-                showModal('❌', 'Você precisa estar logado como admin.');
-                return;
-            }
-            
-            const playerName = document.getElementById('adminSeatPlayer').value;
-            
-            if (!playerName) {
-                showModal('❌', 'Selecione um jogador.');
-                return;
-            }
-            
-            let found = false;
-            const updatedSeats = {};
-            
-            // Copia os assentos existentes
-            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                updatedSeats[mesa] = [...jogadores];
-            }
-            
-            for (const [mesa, jogadores] of Object.entries(updatedSeats)) {
-                if (jogadores && Array.isArray(jogadores)) {
-                    const index = jogadores.indexOf(playerName);
-                    if (index !== -1) {
-                        updatedSeats[mesa][index] = null;
-                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null && p !== undefined && p !== '');
-                        if (updatedSeats[mesa].length === 0) {
-                            delete updatedSeats[mesa];
-                        }
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (!found) {
-                showModal('❌', `${playerName} não possui um assento atribuído.`);
-                return;
-            }
-            
-            console.log('Removendo assento, novo estado:', JSON.stringify(updatedSeats));
-            
-            assentosRef.set(updatedSeats)
-                .then(() => {
-                    showModal('✅', `Assento de ${playerName} removido com sucesso!`);
-                })
-                .catch((error) => {
-                    console.error('Erro ao remover:', error);
-                    showModal('❌', 'Erro ao remover assento: ' + error.message);
-                });
-        }
+// ============ ADMIN / MODAIS ============
+function toggleAdmin() { document.getElementById('adminForm').classList.toggle('active'); }
+function loginAdmin() {
+  if (document.getElementById('adminPassword').value === 'poker123') {
+    isAdmin = true;
+    document.getElementById('adminControls').style.display = 'block';
+    updateAdminPlayerList(); updateAdminSeatPlayers(); updateAdminSeatList();
+    showModal('✅', 'Login realizado!');
+  } else showModal('❌', 'Senha incorreta!');
+}
+function showRules() { document.getElementById('rulesModal').classList.add('active'); }
+function closeRulesModal() { document.getElementById('rulesModal').classList.remove('active'); }
+function showModal(icon, msg) {
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalMessage').textContent = msg;
+  document.getElementById('modal').classList.add('active');
+}
+function closeModal() { document.getElementById('modal').classList.remove('active'); }
+document.getElementById('seatModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeSeatModal(); });
 
-        // REMOVE UM ASSENTO ESPECÍFICO
-        function removeSeat(mesa, jogador) {
-            if (!isAdmin) return;
-            
-            if (confirm(`Remover ${jogador} da ${mesa}?`)) {
-                const updatedSeats = {};
-                
-                // Copia os assentos existentes
-                for (const [m, jogadores] of Object.entries(seatAssignments)) {
-                    updatedSeats[m] = [...jogadores];
-                }
-                
-                if (updatedSeats[mesa]) {
-                    const index = updatedSeats[mesa].indexOf(jogador);
-                    if (index !== -1) {
-                        updatedSeats[mesa][index] = null;
-                        updatedSeats[mesa] = updatedSeats[mesa].filter(p => p !== null && p !== undefined && p !== '');
-                        if (updatedSeats[mesa].length === 0) {
-                            delete updatedSeats[mesa];
-                        }
-                        
-                        console.log('Removendo assento específico, novo estado:', JSON.stringify(updatedSeats));
-                        
-                        assentosRef.set(updatedSeats)
-                            .then(() => {
-                                showModal('✅', `${jogador} removido da ${mesa}.`);
-                            })
-                            .catch((error) => {
-                                console.error('Erro ao remover:', error);
-                                showModal('❌', 'Erro ao remover assento: ' + error.message);
-                            });
-                    }
-                }
-            }
-        }
-
-        // ============ FUNÇÕES DE JOGADORES ============
-
-        // CARREGA OS JOGADORES CONFIRMADOS
-        function loadConfirmedPlayers() {
-            confirmadosRef.on('value', function(snapshot) {
-                const players = [];
-                const data = snapshot.val();
-                
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        players.push({ id: key, ...data[key] });
-                    });
-                }
-                
-                players.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-                
-                const official = players.filter(p => p.status !== 'waiting');
-                const waiting = players.filter(p => p.status === 'waiting');
-                
-                allPlayers = [...official, ...waiting];
-                
-                console.log('Jogadores carregados:', allPlayers.length);
-                
-                // Atualiza contadores
-                document.getElementById('confirmedCount').textContent = official.length;
-                
-                const newSoccerCount = official.filter(p => p.group === 'Poker New Soccer').length;
-                const quintaCount = official.filter(p => p.group === 'Poker de Quinta').length;
-                document.getElementById('countNewSoccer').textContent = newSoccerCount;
-                document.getElementById('countQuinta').textContent = quintaCount;
-                
-                // Calcula janta mais votada
-                const dinnerVotes = {
-                    'Bife a Role': { votes: 0, icon: '🥩' },
-                    'Vaca Atolada': { votes: 0, icon: '🍖' },
-                    'Rabada com Polenta': { votes: 0, icon: '🍲' }
-                };
-                
-                official.forEach(p => {
-                    if (p.dinner && dinnerVotes[p.dinner]) {
-                        dinnerVotes[p.dinner].votes++;
-                    }
-                });
-                
-                let mostVoted = null;
-                let maxVotes = 0;
-                
-                Object.keys(dinnerVotes).forEach(dinner => {
-                    if (dinnerVotes[dinner].votes > maxVotes) {
-                        maxVotes = dinnerVotes[dinner].votes;
-                        mostVoted = dinner;
-                    }
-                });
-                
-                if (mostVoted && maxVotes > 0) {
-                    const icon = dinnerVotes[mostVoted].icon;
-                    document.getElementById('mostVotedDinner').textContent = `${icon} ${mostVoted}`;
-                    document.getElementById('mostVotedVotes').textContent = `${maxVotes} voto${maxVotes > 1 ? 's' : ''}`;
-                } else {
-                    document.getElementById('mostVotedDinner').textContent = '-';
-                    document.getElementById('mostVotedVotes').textContent = '';
-                }
-                
-                // Atualiza botão de confirmação
-                const confirmBtn = document.getElementById('confirmBtn');
-                if (official.length >= MAX_OFFICIAL) {
-                    confirmBtn.disabled = true;
-                    confirmBtn.textContent = '⏳ Lista Cheia - Entrar na Espera';
-                } else {
-                    confirmBtn.disabled = false;
-                    confirmBtn.textContent = '✅ Confirmar Presença';
-                }
-                
-                // Atualiza listas
-                updatePlayerLists(official, waiting);
-                updateAdminPlayerList();
-                
-                // Atualiza interfaces de assentos
-                updateAllInterfaces();
-            });
-        }
-
-        // ATUALIZA AS LISTAS DE JOGADORES
-        function updatePlayerLists(official, waiting) {
-            const officialList = document.getElementById('officialList');
-            const waitingList = document.getElementById('waitingList');
-            
-            officialList.innerHTML = '';
-            waitingList.innerHTML = '';
-            
-            official.forEach((player, index) => {
-                const playerItem = createPlayerItem(player, index + 1, false);
-                officialList.appendChild(playerItem);
-            });
-            
-            waiting.forEach((player, index) => {
-                const playerItem = createPlayerItem(player, index + 1, true);
-                waitingList.appendChild(playerItem);
-            });
-        }
-
-        // CRIA UM ITEM DE JOGADOR
-        function createPlayerItem(player, index, isWaiting) {
-            const playerItem = document.createElement('div');
-            playerItem.className = 'player-item' + (isWaiting ? ' waiting-list' : '');
-            
-            const groupBadge = player.group === 'Poker New Soccer' 
-                ? `<span class="badge badge-turma-new">${player.group}</span>`
-                : `<span class="badge badge-turma-quinta">${player.group}</span>`;
-            
-            const dinnerBadge = player.dinner 
-                ? `<span class="badge badge-janta">🍽️ ${player.dinner}</span>`
-                : '';
-            
-            const statusBadge = isWaiting 
-                ? `<span class="badge badge-waiting">⏳ Espera</span>`
-                : `<span class="badge" style="background:rgba(76,175,80,0.2);color:#81c784;border:1px solid #81c784;">✅ Oficial</span>`;
-            
-            // Verifica se o jogador tem assento
-            let hasSeat = false;
-            let seatInfo = '';
-            for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                if (jogadores && Array.isArray(jogadores) && jogadores.includes(player.name)) {
-                    const idx = jogadores.indexOf(player.name);
-                    hasSeat = true;
-                    seatInfo = `${mesa} - Assento ${idx + 1}`;
-                    break;
-                }
-            }
-            
-            const seatBadge = hasSeat 
-                ? `<span class="badge" style="background:rgba(33,150,243,0.2);color:#64b5f6;border:1px solid #64b5f6;">🪑 ${seatInfo}</span>`
-                : '';
-            
-            playerItem.innerHTML = `
-                <div class="player-info">
-                    <div style="display: flex; align-items: center;">
-                        <span class="player-number">${index}</span>
-                        <span class="player-name">🃏 ${player.name}</span>
-                    </div>
-                    ${player.phone ? `<span style="color: #25D366; font-size: 12px;"><i class="fab fa-whatsapp"></i> ${player.phone}</span>` : ''}
-                </div>
-                <div class="badge-container">
-                    ${groupBadge}
-                    ${dinnerBadge}
-                    ${statusBadge}
-                    ${seatBadge}
-                </div>
-            `;
-            return playerItem;
-        }
-
-        // ATUALIZA A LISTA DE JOGADORES NO ADMIN
-        function updateAdminPlayerList() {
-            const adminPlayerList = document.getElementById('adminPlayerList');
-            adminPlayerList.innerHTML = '';
-            
-            if (!isAdmin) return;
-            
-            allPlayers.forEach((player) => {
-                const isWaiting = player.status === 'waiting';
-                const adminPlayerItem = document.createElement('div');
-                adminPlayerItem.className = `admin-player-item ${isWaiting ? 'waiting' : 'official'}`;
-                
-                const actions = document.createElement('div');
-                actions.className = 'admin-actions';
-                
-                if (isWaiting) {
-                    const promoteBtn = document.createElement('button');
-                    promoteBtn.className = 'btn-promote';
-                    promoteBtn.innerHTML = '⬆ Promover';
-                    promoteBtn.onclick = () => promotePlayer(player.id);
-                    actions.appendChild(promoteBtn);
-                }
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'btn-remove-player';
-                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-                removeBtn.onclick = () => removePlayerById(player.id);
-                actions.appendChild(removeBtn);
-                
-                // Verifica se tem assento
-                let hasSeat = false;
-                let seatInfo = '';
-                for (const [mesa, jogadores] of Object.entries(seatAssignments)) {
-                    if (jogadores && Array.isArray(jogadores) && jogadores.includes(player.name)) {
-                        const idx = jogadores.indexOf(player.name);
-                        hasSeat = true;
-                        seatInfo = `${mesa} A${idx + 1}`;
-                        break;
-                    }
-                }
-                
-                adminPlayerItem.innerHTML = `
-                    <span style="font-size: 13px;">
-                        ${player.name} (${player.group})
-                        ${isWaiting ? ' ⏳' : ' ✅'}
-                        ${hasSeat ? ` 🪑 ${seatInfo}` : ''}
-                    </span>
-                `;
-                adminPlayerItem.appendChild(actions);
-                adminPlayerList.appendChild(adminPlayerItem);
-            });
-        }
-
-        // PROMOVE UM JOGADOR DA LISTA DE ESPERA
-        function promotePlayer(playerId) {
-            if (!isAdmin) return;
-            
-            const officialCount = allPlayers.filter(p => p.status !== 'waiting').length;
-            
-            if (officialCount >= MAX_OFFICIAL) {
-                showModal('❌', 'Lista oficial já está cheia (40 jogadores)!');
-                return;
-            }
-            
-            confirmadosRef.child(playerId).update({
-                status: null
-            }).then(() => {
-                showModal('✅', 'Jogador promovido para a lista oficial!');
-            }).catch((error) => {
-                showModal('❌', 'Erro ao promover jogador.');
-            });
-        }
-
-        // REMOVE UM JOGADOR POR ID
-        function removePlayerById(playerId) {
-            if (!isAdmin) return;
-            if (confirm('Tem certeza que deseja remover este jogador?')) {
-                confirmadosRef.child(playerId).remove().then(() => {
-                    showModal('✅', 'Jogador removido com sucesso!');
-                }).catch((error) => {
-                    showModal('❌', 'Erro ao remover jogador.');
-                });
-            }
-        }
-
-        // ============ FUNÇÕES DE FORMULÁRIO ============
-
-        // FORMATA TELEFONE
-        function formatPhone(phone) {
-            let numbers = phone.replace(/\D/g, '');
-            numbers = numbers.slice(0, 11);
-            
-            if (numbers.length <= 2) return numbers;
-            else if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-            else if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
-            else return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
-        }
-
-        document.getElementById('playerPhone').addEventListener('input', function(e) {
-            this.value = formatPhone(this.value);
-        });
-
-        // CONFIRMA PRESENÇA
-        function confirmPresence() {
-            const name = capitalizeName(document.getElementById('playerName').value.trim());
-            const phone = document.getElementById('playerPhone').value.trim();
-            const group = document.getElementById('playerGroup').value;
-            
-            if (!name) {
-                showModal('❌', 'Por favor, digite seu nome!');
-                return;
-            }
-            
-            if (!phone) {
-                showModal('❌', 'Por favor, digite seu WhatsApp!');
-                return;
-            }
-            
-            if (!group) {
-                showModal('❌', 'Por favor, selecione sua turma!');
-                return;
-            }
-            
-            if (!selectedDinner) {
-                showModal('❌', 'Por favor, escolha sua opção de janta!');
-                return;
-            }
-            
-            if (allPlayers.some(p => p.name === name)) {
-                showModal('❌', 'Este nome já está inscrito!');
-                return;
-            }
-            
-            const officialCount = allPlayers.filter(p => p.status !== 'waiting').length;
-            const isWaiting = officialCount >= MAX_OFFICIAL;
-            
-            const newPlayerRef = confirmadosRef.push();
-            const playerData = {
-                name: name,
-                phone: phone,
-                group: group,
-                dinner: selectedDinner,
-                timestamp: Date.now()
-            };
-            
-            if (isWaiting) {
-                playerData.status = 'waiting';
-            }
-            
-            newPlayerRef.set(playerData).then(() => {
-                document.getElementById('playerName').value = '';
-                document.getElementById('playerPhone').value = '';
-                document.getElementById('playerGroup').value = '';
-                document.querySelectorAll('.dinner-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                selectedDinner = '';
-                
-                if (isWaiting) {
-                    showModal('⏳', `${name}, você foi colocado na lista de espera!`);
-                } else {
-                    showModal('✅', `${name}, sua presença foi confirmada!`);
-                }
-            }).catch((error) => {
-                showModal('❌', 'Erro ao confirmar. Tente novamente.');
-            });
-        }
-
-        // ============ FUNÇÕES DE CANCELAMENTO ============
-
-        function showCancelModal() {
-            document.getElementById('cancelNameInput').value = '';
-            document.getElementById('cancelModal').classList.add('active');
-        }
-
-        function closeCancelModal() {
-            document.getElementById('cancelModal').classList.remove('active');
-        }
-
-        function confirmCancel() {
-            const name = capitalizeName(document.getElementById('cancelNameInput').value.trim());
-            
-            if (!name) {
-                closeCancelModal();
-                showModal('❌', 'Digite seu nome para cancelar!');
-                return;
-            }
-            
-            const player = allPlayers.find(p => p.name === name);
-            
-            if (player) {
-                let whatsappNumber;
-                if (player.group === 'Poker de Quinta') {
-                    whatsappNumber = '5541987210685';
-                } else if (player.group === 'Poker New Soccer') {
-                    whatsappNumber = '5541998046898';
-                } else {
-                    whatsappNumber = '5541987210685';
-                }
-                
-                const message = `Olá! Gostaria de CANCELAR minha inscrição no Poker dos Amigos.%0A%0A*Nome:* ${player.name}%0A*WhatsApp:* ${player.phone || 'Não informado'}%0A*Turma:* ${player.group}%0A%0A*Por favor, remova meu nome da lista.*`;
-                
-                window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
-                
-                closeCancelModal();
-                showModal('📱', 'Solicitação de cancelamento enviada pelo WhatsApp! O admin irá remover sua inscrição.');
-            } else {
-                closeCancelModal();
-                showModal('❌', 'Nome não encontrado na lista.');
-            }
-        }
-
-        // ============ FUNÇÕES DE ADMIN ============
-
-        function toggleAdmin() {
-            const adminForm = document.getElementById('adminForm');
-            adminForm.classList.toggle('active');
-        }
-
-        function loginAdmin() {
-            const password = document.getElementById('adminPassword').value;
-            
-            if (password === 'poker123') {
-                isAdmin = true;
-                document.getElementById('adminControls').style.display = 'block';
-                updateAdminPlayerList();
-                updateAdminSeatPlayers();
-                updateAdminSeatList();
-                showModal('✅', 'Login realizado!');
-            } else {
-                showModal('❌', 'Senha incorreta!');
-            }
-        }
-
-        // ============ FUNÇÕES DE MODAL ============
-
-        function showRules() {
-            document.getElementById('rulesModal').classList.add('active');
-        }
-
-        function closeRulesModal() {
-            document.getElementById('rulesModal').classList.remove('active');
-        }
-
-        function showModal(icon, message) {
-            document.getElementById('modalIcon').textContent = icon;
-            document.getElementById('modalMessage').textContent = message;
-            document.getElementById('modal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
-
-        // Fecha o modal de assentos ao clicar fora
-        document.getElementById('seatModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeSeatModal();
-            }
-        });
-
-        // ============ INICIALIZAÇÃO ============
-        
-        console.log('Inicializando aplicação...');
-        // Carrega os dados do Firebase
-        loadSeatAssignments();
-        loadConfirmedPlayers();
-    </script>
+showPlayerSeat();
+loadSeatAssignments();
+loadConfirmedPlayers();
+</script>
 </body>
 </html>
