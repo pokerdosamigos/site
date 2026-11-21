@@ -458,9 +458,9 @@ function showPlayerSeat() {
       <div class="ticket-player-name">${name}</div>
       <div class="ticket-body">
         <div class="ticket-item"><div class="label">🪑 MESA</div><div class="value">${s.mesa}</div></div>
-        <div class="ticket-item"><div class="label">📍 ASSENTO</div><div class="value">${s.idx + 1}</div></div>
+        <div class="ticket-item"><div class="label">🪑 ASSENTO</div><div class="value">${s.idx + 1}</div></div>
       </div>
-      <div class="ticket-footer"><i class="fas fa-check-circle"></i> Confirme sua presença no local</div>
+      <div class="ticket-footer"><i class="fas fa-check-circle"></i> Entregue esse ticket ao Dealer para ganhar os 2K de Bonus.</div>
       <div class="ticket-info">📅 17 de Dezembro • 19:00 • Quintal do Almirante</div></div>`;
   } else {
     div.innerHTML = `<div class="no-seat-message"><i class="fas fa-question-circle"></i><strong style="color:#9b1b30">${name}</strong><br>Este jogador ainda não possui um assento atribuído.<br><span style="font-size:12px;color:#999">Fale com o administrador para definir sua mesa.</span></div>`;
